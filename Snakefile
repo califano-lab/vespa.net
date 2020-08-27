@@ -1,5 +1,5 @@
 # number of ARACNe bootstrap iterations
-seed = list(range(1,5))
+seed = list(range(1,201))
 
 rule all:
     input:
