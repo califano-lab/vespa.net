@@ -70,23 +70,25 @@ rule ddpi_substrate_regulon_generate:
 rule hsm_substrate_regulon_mit:
     input:
         phosphointeractions = rules.prepare_substrate_regulon.output.phosphointeractions,
+        targets = rules.prepare_substrate_regulon.output.targets,
         matrix = rules.prepare_substrate_regulon.output.matrix
     output:
         mit = "results/hsm_substrate_regulon/fwer_computed.txt"
     threads: 2
     shell:
-        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_substrate_regulon_bs:
     input:
         phosphointeractions = rules.prepare_substrate_regulon.output.phosphointeractions,
+        targets = rules.prepare_substrate_regulon.output.targets,
         matrix = rules.prepare_substrate_regulon.output.matrix,
         mit = rules.hsm_substrate_regulon_mit.output.mit
     output:
         iteration = temp("results/hsm_substrate_regulon/{seed}")
     threads: 2
     shell:
-        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule hsm_substrate_regulon_consolidate:
     input:
@@ -107,15 +109,23 @@ rule hsm_substrate_regulon_generate:
     script:
         "scripts/generate_regulon.R"
 
+# generate dDPI - HSM/D regulon
+rule ddpihsm_substrate_regulon_generate:
+    input:
+        phospho = "phospho.rds",
+        ddpi_substrate_regulon = rules.ddpi_substrate_regulon_generate.output.regulon,
+        hsm_substrate_regulon = rules.hsm_substrate_regulon_generate.output.regulon
+    output:
+        ddpihsm_substrate_regulon = "results/ddpihsm_substrate_regulon/regulon.rds",
+    script:
+        "scripts/prepare_meta_regulon.R"
+
 # prepare activity regulon data
 rule prepare_activity_regulon:
     input:
         phospho = "phospho.rds",
         proteo = "proteo.rds",
-        ref = "phospho.rds",
-        ddpi_substrate_regulon = rules.ddpi_substrate_regulon_generate.output.regulon,
-        hsm_substrate_regulon = rules.hsm_substrate_regulon_generate.output.regulon
-
+        ddpihsm_substrate_regulon = rules.ddpihsm_substrate_regulon_generate.output.ddpihsm_substrate_regulon,
     output:
         kinases = "results/prepare_activity_regulon/kinases.txt",
         kinases_phosphatases = "results/prepare_activity_regulon/kinases_phosphatases.txt",
