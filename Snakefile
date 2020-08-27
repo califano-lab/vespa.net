@@ -10,7 +10,7 @@ rule prepare_substrate_regulon:
     input:
         phospho = "phospho.rds",
         proteo = "proteo.rds",
-        ref = "phospho.rds"
+        ref = "ref.rds"
     output:
         kinases = "results/prepare_substrate_regulon/kinases.txt",
         kinases_phosphatases = "results/prepare_substrate_regulon/kinases_phosphatases.txt",
@@ -30,8 +30,9 @@ rule ddpi_substrate_regulon_mit:
         matrix = rules.prepare_substrate_regulon.output.matrix
     output:
         mit = "results/ddpi_substrate_regulon/fwer_computed.txt"
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s 1 -t && touch {output}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule ddpi_substrate_regulon_bs:
     input:
@@ -42,18 +43,18 @@ rule ddpi_substrate_regulon_bs:
         mit = rules.ddpi_substrate_regulon_mit.output.mit
     output:
         iteration = temp("results/ddpi_substrate_regulon/{seed}")
-    threads: 1
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule ddpi_substrate_regulon_consolidate:
     input:
         iteration = expand("results/ddpi_substrate_regulon/{seed}", seed=seed)
     output:
         network = "results/ddpi_substrate_regulon/network.txt"
-    threads: 1
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -o $(dirname {output}) -c"
+        "java -Xmx8G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
 rule ddpi_substrate_regulon_generate:
     input:
@@ -72,8 +73,9 @@ rule hsm_substrate_regulon_mit:
         matrix = rules.prepare_substrate_regulon.output.matrix
     output:
         mit = "results/hsm_substrate_regulon/fwer_computed.txt"
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -o $(dirname {output}) -s 1 -t && touch {output}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_substrate_regulon_bs:
     input:
@@ -82,18 +84,18 @@ rule hsm_substrate_regulon_bs:
         mit = rules.hsm_substrate_regulon_mit.output.mit
     output:
         iteration = temp("results/hsm_substrate_regulon/{seed}")
-    threads: 1
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule hsm_substrate_regulon_consolidate:
     input:
         iteration = expand("results/hsm_substrate_regulon/{seed}", seed=seed)
     output:
         network = "results/hsm_substrate_regulon/network.txt"
-    threads: 1
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -o $(dirname {output}) -c"
+        "java -Xmx8G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
 rule hsm_substrate_regulon_generate:
     input:
@@ -132,8 +134,9 @@ rule dpi_activity_regulon_mit:
         matrix = rules.prepare_activity_regulon.output.matrix
     output:
         mit = "results/dpi_activity_regulon/fwer_computed.txt"
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s 1 -t && touch {output}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule dpi_activity_regulon_bs:
     input:
@@ -143,18 +146,18 @@ rule dpi_activity_regulon_bs:
         mit = rules.dpi_activity_regulon_mit.output.mit
     output:
         iteration = temp("results/dpi_activity_regulon/{seed}")
-    threads: 1
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule dpi_activity_consolidate:
     input:
         iteration = expand("results/dpi_activity_regulon/{seed}", seed=seed)
     output:
         network = "results/dpi_activity_regulon/network.txt"
-    threads: 1
+    threads: 2
     shell:
-        "java -Xmx12G -jar java/aracne.jar -o $(dirname {output}) -c"
+        "java -Xmx8G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
 rule dpi_activity_regulon_generate:
     input:
