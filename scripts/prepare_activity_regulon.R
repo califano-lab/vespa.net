@@ -15,6 +15,12 @@ vmx<-viper(export2mx(phospho), ddpihsm_substrate_regulon, minsize=5, pleiotropy 
 # convert to phosphoVIPER list
 pvl<-vmx2pv(vmx)
 
+# check if proteo-level abundances are present
+if (snakemake@input[["phospho"]] == snakemake@input[["proteo"]]) {
+	yqml<-pvl
+} else {
+	yqml<-rbind(proteo, pvl, fill = TRUE)
+}
+
 # export hpARACNe input files
-yqml<-rbind(proteo, pvl, fill = TRUE)
 export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmpf)
