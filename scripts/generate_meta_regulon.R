@@ -15,12 +15,16 @@ if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 
 # import single regulons
 single_regulons<-snakemake@input[["regulons"]]
-combined_regulons<-sapply(single_regulons, function(X){pruneRegulon(subset_regulon(readRDS(X), rownames(vmxa), min_size=5), 50)})
 
-# combine and optimize regulons
-meta_regulons<-optimizeRegulon(vmxa, combined_regulons, min_size=5)
+if(length(single_regulons)>1) {
+	# tune all regulons
+	combined_regulons<-sapply(single_regulons, function(X){pruneRegulon(subset_regulon(readRDS(X), rownames(vmxa), min_size=5), 50)})
 
-print(meta_regulons)
+	# combine and optimize regulons
+	meta_regulons<-optimizeRegulon(vmxa, combined_regulons, min_size=5)
+} else {
+	meta_regulons<-pruneRegulon(subset_regulon(readRDS(single_regulons), rownames(vmxa), min_size=5), 50)
+}
 
 # save meta regulons
 saveRDS(meta_regulons, snakemake@output[["meta_regulons"]])
