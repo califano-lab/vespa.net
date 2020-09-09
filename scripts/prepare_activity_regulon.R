@@ -23,4 +23,4 @@ if (snakemake@input[["phospho"]] == snakemake@input[["proteo"]]) {
 }
 
 # export hpARACNe input files
-export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmpf)
+export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmp, confidence_threshold = 0.05, interaction_level = "activity")

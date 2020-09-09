@@ -14,4 +14,4 @@ if (snakemake@input[["phospho"]] == snakemake@input[["proteo"]]) {
 }
 
 # export hpARACNe input files
-export2hparacne(qml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmd, unique(readRDS(snakemake@input[["ref"]])$site_id))
+export2hparacne(qml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmd, unique(readRDS(snakemake@input[["ref"]])$site_id), confidence_threshold = 0.05, interaction_level = "substrate")

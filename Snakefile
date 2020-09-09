@@ -193,13 +193,55 @@ rule dpi_activity_regulon_generate:
     script:
         "scripts/generate_regulon.R"
 
+# generate HSM/P regulon
+rule hsm_activity_regulon_mit:
+    input:
+        phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
+        targets = rules.prepare_activity_regulon.output.targets,
+        matrix = rules.prepare_activity_regulon.output.matrix
+    output:
+        mit = "results/{dsid}/hsm_activity_regulon/fwer_computed.txt"
+    threads: 1
+    shell:
+        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+
+rule hsm_activity_regulon_bs:
+    input:
+        phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
+        targets = rules.prepare_activity_regulon.output.targets,
+        matrix = rules.prepare_activity_regulon.output.matrix,
+        mit = rules.hsm_activity_regulon_mit.output.mit
+    output:
+        iteration = temp("results/{dsid}/hsm_activity_regulon/{seed}")
+    threads: 1
+    shell:
+        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+
+rule hsm_activity_consolidate:
+    input:
+        iteration = expand("results/{{dsid}}/hsm_activity_regulon/{seed}", seed=seed)
+    output:
+        network = "results/{dsid}/hsm_activity_regulon/network.txt"
+    threads: 1
+    shell:
+        "java -Xmx4G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
+
+rule hsm_activity_regulon_generate:
+    input:
+        network = rules.hsm_activity_consolidate.output.network,
+        matrix = rules.prepare_activity_regulon.output.matrix,
+        peptides = rules.prepare_activity_regulon.output.peptides
+    output:
+        regulon = "results/{dsid}/hsm_activity_regulon.rds"
+    script:
+        "scripts/generate_regulon.R"
 
 # generate meta activity regulons
 rule meta_activity_regulon_generate:
     input:
         ref = rules.prepare_substrate_regulon.input.ref,
         substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_regulons,
-        regulons = expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids)
+        regulons = [expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids)]
     output:
         meta_regulons = "results/meta_activity_regulon.rds",
     script:
