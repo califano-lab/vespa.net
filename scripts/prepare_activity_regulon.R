@@ -2,18 +2,19 @@ library(phosphoviper)
 library(viper)
 
 # import preprocessed data
-phospho<-readRDS(snakemake@input[["phospho"]])
 proteo<-readRDS(snakemake@input[["proteo"]])
+qmx<-export2mx(readRDS(snakemake@input[["phospho"]]))
+qmx<-t(apply(qmx,1,function(X){X[is.na(X)]<-min(X,na.rm=TRUE);return(X)}))
 
 # import dDPI substrate regulon
 meta_substrate_regulons<-readRDS(snakemake@input[["meta_substrate_regulons"]])
 print(meta_substrate_regulons)
 
 # run VIPER
-vmx<-viper(export2mx(phospho), meta_substrate_regulons, minsize=5, pleiotropy = FALSE, pleiotropyArgs = list(regulators = 0.05, shadow = 0.05, targets = 10, penalty = 20, method = "adaptive"))
+vmx<-viper(qmx, meta_substrate_regulons, minsize=10, pleiotropy = TRUE, pleiotropyArgs = list(regulators = 0.05, shadow = 0.05, targets = 10, penalty = 10, method = "adaptive"), cores=snakemake@threads)
 
 # convert to phosphoVIPER list
-pvl<-vmx2pv(vmx)
+pvl<-vmx2pv(vmx, fasta=snakemake@input[["fasta"]])
 
 # check if proteo-level abundances are present
 if (snakemake@input[["phospho"]] == snakemake@input[["proteo"]]) {

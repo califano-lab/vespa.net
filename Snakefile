@@ -6,7 +6,7 @@ dsids, = glob_wildcards("{dsid}_phospho.rds")
 
 rule all:
     input:
-        "results/meta_substrate_regulon.rds", "results/meta_activity_regulon.rds"
+        "results/meta_substrate_site_regulon.rds", "results/meta_activity_site_regulon.rds", "results/meta_substrate_protein_regulon.rds", "results/meta_activity_protein_regulon.rds"
 
 # prepare substrate regulon data
 rule prepare_substrate_regulon:
@@ -130,7 +130,9 @@ rule meta_substrate_regulon_generate:
         substrate_regulons = [],
         regulons = expand("results/{dsid}/ddpihsm_substrate_regulon.rds", dsid=dsids)
     output:
-        meta_regulons = "results/meta_substrate_regulon.rds",
+        meta_site_regulons = "results/meta_substrate_site_regulon.rds",
+        meta_protein_regulons = "results/meta_substrate_protein_regulon.rds",
+    threads: 4
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -139,7 +141,8 @@ rule prepare_activity_regulon:
     input:
         phospho = "{dsid}_phospho.rds",
         proteo = "{dsid}_proteo.rds",
-        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_regulons,
+        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        fasta = "library.fasta"
     output:
         kinases = "results/{dsid}/prepare_activity_regulon/kinases.txt",
         kinases_phosphatases = "results/{dsid}/prepare_activity_regulon/kinases_phosphatases.txt",
@@ -147,6 +150,7 @@ rule prepare_activity_regulon:
         phosphointeractions = "results/{dsid}/prepare_activity_regulon/phosphointeractions.txt",
         peptides = "results/{dsid}/prepare_activity_regulon/peptides.txt",
         matrix = "results/{dsid}/prepare_activity_regulon/matrix.txt"
+    threads: 4
     script:
         "scripts/prepare_activity_regulon.R"
 
@@ -240,9 +244,12 @@ rule hsm_activity_regulon_generate:
 rule meta_activity_regulon_generate:
     input:
         ref = rules.prepare_substrate_regulon.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_regulons,
-        regulons = [expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids)]
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        regulons = [expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids)],
+        fasta = "library.fasta"
     output:
-        meta_regulons = "results/meta_activity_regulon.rds",
+        meta_site_regulons = "results/meta_activity_site_regulon.rds",
+        meta_protein_regulons = "results/meta_activity_protein_regulon.rds",
+    threads: 4
     script:
         "scripts/generate_meta_regulon.R"
