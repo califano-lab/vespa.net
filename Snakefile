@@ -6,7 +6,7 @@ dsids, = glob_wildcards("{dsid}_phospho.rds")
 
 rule all:
     input:
-        "results/meta_substrate_site_regulon.rds", "results/meta_activity_site_regulon.rds", "results/meta_substrate_protein_regulon.rds", "results/meta_activity_protein_regulon.rds"
+        "results/ddpi_substrate_site_regulon.rds", "results/hsm_substrate_site_regulon.rds", "results/pc_substrate_site_regulon.rds"
 
 # prepare substrate regulon data
 rule prepare_substrate_regulon:
@@ -23,6 +23,22 @@ rule prepare_substrate_regulon:
         matrix = "results/{dsid}/prepare_substrate_regulon/matrix.txt",
     script:
         "scripts/prepare_substrate_regulon.R"
+
+# prepare substrate regulon data
+rule prepare_pcsubstrate_regulon:
+    input:
+        phospho = "{dsid}_phospho.rds",
+        proteo = "{dsid}_proteo.rds",
+        ref = "reference.rds"
+    output:
+        kinases = "results/{dsid}/prepare_pcsubstrate_regulon/kinases.txt",
+        kinases_phosphatases = "results/{dsid}/prepare_pcsubstrate_regulon/kinases_phosphatases.txt",
+        targets = "results/{dsid}/prepare_pcsubstrate_regulon/targets.txt",
+        phosphointeractions = "results/{dsid}/prepare_pcsubstrate_regulon/phosphointeractions.txt",
+        peptides = "results/{dsid}/prepare_pcsubstrate_regulon/peptides.txt",
+        matrix = "results/{dsid}/prepare_pcsubstrate_regulon/matrix.txt",
+    script:
+        "scripts/prepare_pcsubstrate_regulon.R"
 
 # generate dDPI regulon
 rule ddpi_substrate_regulon_mit:
@@ -112,144 +128,83 @@ rule hsm_substrate_regulon_generate:
     script:
         "scripts/generate_regulon.R"
 
-# generate dDPI - HSM/D regulon
-rule ddpihsm_substrate_regulon_generate:
-    input:
-        ref = rules.prepare_substrate_regulon.input.ref,
-        ddpi_substrate_regulon = rules.ddpi_substrate_regulon_generate.output.regulon,
-        hsm_substrate_regulon = rules.hsm_substrate_regulon_generate.output.regulon
-    output:
-        ddpihsm_substrate_regulon = "results/{dsid}/ddpihsm_substrate_regulon.rds",
-    script:
-        "scripts/generate_substrate_regulon.R"
 
-# generate meta substrate regulons
-rule meta_substrate_regulon_generate:
+# generate PC regulon
+rule pc_substrate_regulon_mit:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
-        substrate_regulons = [],
-        regulons = expand("results/{dsid}/ddpihsm_substrate_regulon.rds", dsid=dsids)
+        phosphointeractions = rules.prepare_pcsubstrate_regulon.output.phosphointeractions,
+        targets = rules.prepare_pcsubstrate_regulon.output.targets,
+        matrix = rules.prepare_pcsubstrate_regulon.output.matrix
     output:
-        meta_site_regulons = "results/meta_substrate_site_regulon.rds",
-        meta_protein_regulons = "results/meta_substrate_protein_regulon.rds",
-    threads: 4
-    script:
-        "scripts/generate_meta_regulon.R"
-
-# prepare activity regulon data
-rule prepare_activity_regulon:
-    input:
-        phospho = "{dsid}_phospho.rds",
-        proteo = "{dsid}_proteo.rds",
-        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
-        fasta = "library.fasta"
-    output:
-        kinases = "results/{dsid}/prepare_activity_regulon/kinases.txt",
-        kinases_phosphatases = "results/{dsid}/prepare_activity_regulon/kinases_phosphatases.txt",
-        targets = "results/{dsid}/prepare_activity_regulon/targets.txt",
-        phosphointeractions = "results/{dsid}/prepare_activity_regulon/phosphointeractions.txt",
-        peptides = "results/{dsid}/prepare_activity_regulon/peptides.txt",
-        matrix = "results/{dsid}/prepare_activity_regulon/matrix.txt"
-    threads: 4
-    script:
-        "scripts/prepare_activity_regulon.R"
-
-# generate DPI regulon
-rule dpi_activity_regulon_mit:
-    input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix
-    output:
-        mit = "results/{dsid}/dpi_activity_regulon/fwer_computed.txt"
-    threads: 1
-    shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
-
-rule dpi_activity_regulon_bs:
-    input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        mit = rules.dpi_activity_regulon_mit.output.mit
-    output:
-        iteration = temp("results/{dsid}/dpi_activity_regulon/{seed}")
-    threads: 1
-    shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
-
-rule dpi_activity_consolidate:
-    input:
-        iteration = expand("results/{{dsid}}/dpi_activity_regulon/{seed}", seed=seed)
-    output:
-        network = "results/{dsid}/dpi_activity_regulon/network.txt"
-    threads: 1
-    shell:
-        "java -Xmx4G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
-
-rule dpi_activity_regulon_generate:
-    input:
-        network = rules.dpi_activity_consolidate.output.network,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        peptides = rules.prepare_activity_regulon.output.peptides
-    output:
-        regulon = "results/{dsid}/dpi_activity_regulon.rds"
-    script:
-        "scripts/generate_regulon.R"
-
-# generate HSM/P regulon
-rule hsm_activity_regulon_mit:
-    input:
-        phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix
-    output:
-        mit = "results/{dsid}/hsm_activity_regulon/fwer_computed.txt"
+        mit = "results/{dsid}/pc_substrate_regulon/fwer_computed.txt"
     threads: 1
     shell:
         "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
-rule hsm_activity_regulon_bs:
+rule pc_substrate_regulon_bs:
     input:
-        phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        mit = rules.hsm_activity_regulon_mit.output.mit
+        phosphointeractions = rules.prepare_pcsubstrate_regulon.output.phosphointeractions,
+        targets = rules.prepare_pcsubstrate_regulon.output.targets,
+        matrix = rules.prepare_pcsubstrate_regulon.output.matrix,
+        mit = rules.pc_substrate_regulon_mit.output.mit
     output:
-        iteration = temp("results/{dsid}/hsm_activity_regulon/{seed}")
+        iteration = temp("results/{dsid}/pc_substrate_regulon/{seed}")
     threads: 1
     shell:
         "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
-rule hsm_activity_consolidate:
+rule pc_substrate_regulon_consolidate:
     input:
-        iteration = expand("results/{{dsid}}/hsm_activity_regulon/{seed}", seed=seed)
+        iteration = expand("results/{{dsid}}/pc_substrate_regulon/{seed}", seed=seed)
     output:
-        network = "results/{dsid}/hsm_activity_regulon/network.txt"
+        network = "results/{dsid}/pc_substrate_regulon/network.txt"
     threads: 1
     shell:
         "java -Xmx4G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
-rule hsm_activity_regulon_generate:
+rule pc_substrate_regulon_generate:
     input:
-        network = rules.hsm_activity_consolidate.output.network,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        peptides = rules.prepare_activity_regulon.output.peptides
+        network = rules.pc_substrate_regulon_consolidate.output.network,
+        matrix = rules.prepare_pcsubstrate_regulon.output.matrix,
+        peptides = rules.prepare_pcsubstrate_regulon.output.peptides
     output:
-        regulon = "results/{dsid}/hsm_activity_regulon.rds"
+        regulon = "results/{dsid}/pc_substrate_regulon.rds"
     script:
         "scripts/generate_regulon.R"
 
-# generate meta activity regulons
-rule meta_activity_regulon_generate:
+# generate ddpi substrate regulons
+rule meta_ddpi_substrate_regulon_generate:
     input:
         ref = rules.prepare_substrate_regulon.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
-        regulons = [expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids)],
-        fasta = "library.fasta"
+        substrate_regulons = [],
+        regulons = expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids)
     output:
-        meta_site_regulons = "results/meta_activity_site_regulon.rds",
-        meta_protein_regulons = "results/meta_activity_protein_regulon.rds",
+        meta_site_regulons = "results/ddpi_substrate_site_regulon.rds",
+        meta_protein_regulons = "results/ddpi_substrate_protein_regulon.rds",
+    threads: 4
+    script:
+        "scripts/generate_meta_regulon.R"
+
+rule meta_hsm_substrate_regulon_generate:
+    input:
+        ref = rules.prepare_substrate_regulon.input.ref,
+        substrate_regulons = [],
+        regulons = expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids)
+    output:
+        meta_site_regulons = "results/hsm_substrate_site_regulon.rds",
+        meta_protein_regulons = "results/hsm_substrate_protein_regulon.rds",
+    threads: 4
+    script:
+        "scripts/generate_meta_regulon.R"
+
+rule meta_pc_substrate_regulon_generate:
+    input:
+        ref = rules.prepare_substrate_regulon.input.ref,
+        substrate_regulons = [],
+        regulons = expand("results/{dsid}/pc_substrate_regulon.rds", dsid=dsids)
+    output:
+        meta_site_regulons = "results/pc_substrate_site_regulon.rds",
+        meta_protein_regulons = "results/pc_substrate_protein_regulon.rds",
     threads: 4
     script:
         "scripts/generate_meta_regulon.R"
