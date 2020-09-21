@@ -11,7 +11,7 @@ meta_substrate_regulons<-readRDS(snakemake@input[["meta_substrate_regulons"]])
 print(meta_substrate_regulons)
 
 # run VIPER
-vmx<-viper(qmx, meta_substrate_regulons, minsize=10, pleiotropy = TRUE, pleiotropyArgs = list(regulators = 0.05, shadow = 0.05, targets = 10, penalty = 10, method = "adaptive"), cores=snakemake@threads)
+vmx<-viper(qmx, meta_substrate_regulons, minsize=10, pleiotropy = TRUE, pleiotropyArgs = list(regulators = 0.05, shadow = 0.05, targets = 3, penalty = 10, method = "adaptive"), cores=snakemake@threads)
 
 # convert to phosphoVIPER list
 pvl<-vmx2pv(vmx, fasta=snakemake@input[["fasta"]])
