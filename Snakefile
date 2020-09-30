@@ -93,7 +93,7 @@ rule hsm_substrate_regulon_bs:
         iteration = temp("results/{dsid}/hsm_substrate_regulon/{seed}")
     threads: 1
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) --noDPI -j {threads} && touch {output.iteration}"
 
 rule hsm_substrate_regulon_consolidate:
     input:
@@ -221,6 +221,7 @@ rule dpi_activity_regulon_generate:
 # generate HSM/P regulon
 rule hsm_activity_regulon_mit:
     input:
+        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
         targets = rules.prepare_activity_regulon.output.targets,
         matrix = rules.prepare_activity_regulon.output.matrix
@@ -228,10 +229,11 @@ rule hsm_activity_regulon_mit:
         mit = "results/{dsid}/hsm_activity_regulon/fwer_computed.txt"
     threads: 1
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_activity_regulon_bs:
     input:
+        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
         targets = rules.prepare_activity_regulon.output.targets,
         matrix = rules.prepare_activity_regulon.output.matrix,
@@ -240,7 +242,7 @@ rule hsm_activity_regulon_bs:
         iteration = temp("results/{dsid}/hsm_activity_regulon/{seed}")
     threads: 1
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) --noDPI -j {threads} && touch {output.iteration}"
 
 rule hsm_activity_consolidate:
     input:
