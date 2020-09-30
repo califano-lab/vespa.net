@@ -11,7 +11,7 @@ meta_substrate_regulons<-readRDS(snakemake@input[["meta_substrate_regulons"]])
 print(meta_substrate_regulons)
 
 # run VIPER
-vmx<-viper(qmx, meta_substrate_regulons, minsize=10, pleiotropy = TRUE, pleiotropyArgs = list(regulators = 0.05, shadow = 0.05, targets = 3, penalty = 10, method = "adaptive"), cores=snakemake@threads)
+vmx<-viper(qmx, meta_substrate_regulons, minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
 # convert to phosphoVIPER list
 pvl<-vmx2pv(vmx, fasta=snakemake@input[["fasta"]])
@@ -24,4 +24,4 @@ if (snakemake@input[["phospho"]] == snakemake@input[["proteo"]]) {
 }
 
 # export hpARACNe input files
-export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmp, confidence_threshold = 0.05, interaction_level = "activity")
+export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmp, confidence_threshold = snakemake@params[["hsm_threshold"]], interaction_level = "activity")

@@ -21,6 +21,8 @@ rule prepare_substrate_regulon:
         phosphointeractions = "results/{dsid}/prepare_substrate_regulon/phosphointeractions.txt",
         peptides = "results/{dsid}/prepare_substrate_regulon/peptides.txt",
         matrix = "results/{dsid}/prepare_substrate_regulon/matrix.txt",
+    params:
+        hsm_threshold = 0.05
     script:
         "scripts/prepare_substrate_regulon.R"
 
@@ -120,6 +122,9 @@ rule ddpihsm_substrate_regulon_generate:
         hsm_substrate_regulon = rules.hsm_substrate_regulon_generate.output.regulon
     output:
         ddpihsm_substrate_regulon = "results/{dsid}/ddpihsm_substrate_regulon.rds",
+    params:
+        minimum_targets = 10,
+        maximum_targets = 50
     script:
         "scripts/generate_substrate_regulon.R"
 
@@ -132,6 +137,14 @@ rule meta_substrate_regulon_generate:
     output:
         meta_site_regulons = "results/meta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/meta_substrate_protein_regulon.rds",
+    params:
+        minimum_targets = 10,
+        maximum_targets = 50,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 3,
+        ct_penalty = 10
     threads: 4
     script:
         "scripts/generate_meta_regulon.R"
@@ -150,6 +163,14 @@ rule prepare_activity_regulon:
         phosphointeractions = "results/{dsid}/prepare_activity_regulon/phosphointeractions.txt",
         peptides = "results/{dsid}/prepare_activity_regulon/peptides.txt",
         matrix = "results/{dsid}/prepare_activity_regulon/matrix.txt"
+    params:
+        minimum_targets = 10,
+        hsm_threshold = 0.05,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 3,
+        ct_penalty = 10
     threads: 4
     script:
         "scripts/prepare_activity_regulon.R"
@@ -250,6 +271,14 @@ rule meta_activity_regulon_generate:
     output:
         meta_site_regulons = "results/meta_activity_site_regulon.rds",
         meta_protein_regulons = "results/meta_activity_protein_regulon.rds",
+    params:
+        minimum_targets = 10,
+        maximum_targets = 50,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 3,
+        ct_penalty = 10
     threads: 4
     script:
         "scripts/generate_meta_regulon.R"
