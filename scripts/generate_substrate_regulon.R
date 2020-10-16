@@ -1,5 +1,5 @@
-library(phosphoviper)
 library(viper)
+library(phosphoviper)
 
 # import preprocessed data
 qmx<-export2mx(readRDS(snakemake@input[["ref"]]))
@@ -7,12 +7,12 @@ qmx<-export2mx(readRDS(snakemake@input[["ref"]]))
 # import dDPI substrate regulon
 ddpi_substrate_regulon<-readRDS(snakemake@input[["ddpi_substrate_regulon"]])
 print(ddpi_substrate_regulon)
-ddpi_substrate_regulon<-pruneRegulon(subset_regulon(ddpi_substrate_regulon, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])
+ddpi_substrate_regulon<-pruneRegulon(subsetRegulon(ddpi_substrate_regulon, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])
 
 # import HSM/D substrate regulon
 hsm_substrate_regulon<-readRDS(snakemake@input[["hsm_substrate_regulon"]])
 print(hsm_substrate_regulon)
-hsm_substrate_regulon<-pruneRegulon(subset_regulon(hsm_substrate_regulon, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])
+hsm_substrate_regulon<-pruneRegulon(subsetRegulon(hsm_substrate_regulon, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])
 
 # combine and optimize regulon
 ddpihsm_substrate_regulon<-list("ddpi_substrate_regulon"=ddpi_substrate_regulon, "hsm_substrate_regulon"=hsm_substrate_regulon)

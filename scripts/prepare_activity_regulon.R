@@ -1,5 +1,5 @@
-library(phosphoviper)
 library(viper)
+library(phosphoviper)
 
 # import preprocessed data
 proteo<-readRDS(snakemake@input[["proteo"]])

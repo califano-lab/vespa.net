@@ -1,5 +1,5 @@
-library(phosphoviper)
 library(viper)
+library(phosphoviper)
 
 # import preprocessed data
 qmx<-export2mx(readRDS(snakemake@input[["ref"]]))
@@ -20,12 +20,12 @@ single_regulons<-snakemake@input[["regulons"]]
 
 if(length(single_regulons)>1) {
 	# tune all regulons
-	combined_regulons<-sapply(single_regulons, function(X){pruneRegulon(subset_regulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])})
+	combined_regulons<-sapply(single_regulons, function(X){pruneRegulon(subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])})
 
 	# combine and optimize regulons
 	meta_site_regulons<-optimizeRegulon(vmxa, combined_regulons, min_size=snakemake@params[["minimum_targets"]])
 } else {
-	meta_site_regulons<-pruneRegulon(subset_regulon(readRDS(single_regulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])
+	meta_site_regulons<-pruneRegulon(subsetRegulon(readRDS(single_regulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]])
 }
 
 # generate protein-level regulons

@@ -22,7 +22,10 @@ rule prepare_substrate_regulon:
         peptides = "results/{dsid}/prepare_substrate_regulon/peptides.txt",
         matrix = "results/{dsid}/prepare_substrate_regulon/matrix.txt",
     params:
-        hsm_threshold = 0.05
+        hsm_threshold = 0.05,
+        restrict_peptides = False
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/prepare_substrate_regulon.R"
 
@@ -36,8 +39,10 @@ rule ddpi_substrate_regulon_mit:
     output:
         mit = "results/{dsid}/ddpi_substrate_regulon/fwer_computed.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule ddpi_substrate_regulon_bs:
     input:
@@ -49,8 +54,10 @@ rule ddpi_substrate_regulon_bs:
     output:
         iteration = temp("results/{dsid}/ddpi_substrate_regulon/{seed}")
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule ddpi_substrate_regulon_consolidate:
     input:
@@ -58,8 +65,10 @@ rule ddpi_substrate_regulon_consolidate:
     output:
         network = "results/{dsid}/ddpi_substrate_regulon/network.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
 rule ddpi_substrate_regulon_generate:
     input:
@@ -68,6 +77,8 @@ rule ddpi_substrate_regulon_generate:
         peptides = rules.prepare_substrate_regulon.output.peptides
     output:
         regulon = "results/{dsid}/ddpi_substrate_regulon.rds"
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -80,8 +91,10 @@ rule hsm_substrate_regulon_mit:
     output:
         mit = "results/{dsid}/hsm_substrate_regulon/fwer_computed.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_substrate_regulon_bs:
     input:
@@ -92,8 +105,10 @@ rule hsm_substrate_regulon_bs:
     output:
         iteration = temp("results/{dsid}/hsm_substrate_regulon/{seed}")
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) --noDPI -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) --noDPI -j {threads} && touch {output.iteration}"
 
 rule hsm_substrate_regulon_consolidate:
     input:
@@ -101,8 +116,10 @@ rule hsm_substrate_regulon_consolidate:
     output:
         network = "results/{dsid}/hsm_substrate_regulon/network.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
 rule hsm_substrate_regulon_generate:
     input:
@@ -111,6 +128,8 @@ rule hsm_substrate_regulon_generate:
         peptides = rules.prepare_substrate_regulon.output.peptides
     output:
         regulon = "results/{dsid}/hsm_substrate_regulon.rds"
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -125,6 +144,8 @@ rule ddpihsm_substrate_regulon_generate:
     params:
         minimum_targets = 10,
         maximum_targets = 50
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/generate_substrate_regulon.R"
 
@@ -146,6 +167,8 @@ rule meta_substrate_regulon_generate:
         ct_minimum_targets = 3,
         ct_penalty = 10
     threads: 4
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -172,6 +195,8 @@ rule prepare_activity_regulon:
         ct_minimum_targets = 3,
         ct_penalty = 10
     threads: 4
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/prepare_activity_regulon.R"
 
@@ -184,8 +209,10 @@ rule dpi_activity_regulon_mit:
     output:
         mit = "results/{dsid}/dpi_activity_regulon/fwer_computed.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule dpi_activity_regulon_bs:
     input:
@@ -196,8 +223,10 @@ rule dpi_activity_regulon_bs:
     output:
         iteration = temp("results/{dsid}/dpi_activity_regulon/{seed}")
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule dpi_activity_consolidate:
     input:
@@ -205,8 +234,10 @@ rule dpi_activity_consolidate:
     output:
         network = "results/{dsid}/dpi_activity_regulon/network.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
 rule dpi_activity_regulon_generate:
     input:
@@ -215,6 +246,8 @@ rule dpi_activity_regulon_generate:
         peptides = rules.prepare_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/dpi_activity_regulon.rds"
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -228,8 +261,10 @@ rule hsm_activity_regulon_mit:
     output:
         mit = "results/{dsid}/hsm_activity_regulon/fwer_computed.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_activity_regulon_bs:
     input:
@@ -241,8 +276,10 @@ rule hsm_activity_regulon_bs:
     output:
         iteration = temp("results/{dsid}/hsm_activity_regulon/{seed}")
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) --noDPI -j {threads} && touch {output.iteration}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) --noDPI -j {threads} && touch {output.iteration}"
 
 rule hsm_activity_consolidate:
     input:
@@ -250,8 +287,10 @@ rule hsm_activity_consolidate:
     output:
         network = "results/{dsid}/hsm_activity_regulon/network.txt"
     threads: 1
+    singularity:
+        "aracne.simg"
     shell:
-        "java -Xmx4G -jar java/aracne.jar -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx8G -jar /aracne/dist/aracne.jar -o $(dirname {output}) -c -j {threads}"
 
 rule hsm_activity_regulon_generate:
     input:
@@ -260,6 +299,8 @@ rule hsm_activity_regulon_generate:
         peptides = rules.prepare_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/hsm_activity_regulon.rds"
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -282,5 +323,7 @@ rule meta_activity_regulon_generate:
         ct_minimum_targets = 3,
         ct_penalty = 10
     threads: 4
+    singularity:
+        "phosphoviper.simg"
     script:
         "scripts/generate_meta_regulon.R"
