@@ -1,5 +1,5 @@
 # number of ARACNe bootstrap iterations
-seed = list(range(1,201))
+seed = list(range(1,5))
 
 # obtain dataset ids from phospho data
 dsids, = glob_wildcards("{dsid}_phospho.rds")
