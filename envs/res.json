@@ -1,0 +1,17 @@
+{
+    "__default__" :
+    {
+        "nCPUs"     : "1",
+        "memory"    : 24576,
+        "resources" : "\"rusage[mem=24576,scratch=8192]\"",
+        "name"      : "JOBNAME.{rule}.{wildcards}",
+        "output"    : "logs/cluster/{rule}.{wildcards}.out",
+        "error"     : "logs/cluster/{rule}.{wildcards}.err"
+    },
+
+    "hsm_substrate_regulon_bs" :
+    {
+    "memory"    : 24576,
+    "nCPUs"     : "4"
+    }
+}
