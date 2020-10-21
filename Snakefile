@@ -154,8 +154,8 @@ rule meta_substrate_regulon_generate:
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
-        ct_minimum_targets = 3,
-        ct_penalty = 10
+        ct_minimum_targets = 10,
+        ct_penalty = 20
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -182,8 +182,8 @@ rule prepare_activity_regulon:
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
-        ct_minimum_targets = 3,
-        ct_penalty = 10
+        ct_minimum_targets = 10,
+        ct_penalty = 20
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -316,8 +316,8 @@ rule meta_activity_regulon_generate:
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
-        ct_minimum_targets = 3,
-        ct_penalty = 10
+        ct_minimum_targets = 10,
+        ct_penalty = 20
     threads: 4
     singularity:
         "phosphoviper.simg"
