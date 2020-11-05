@@ -6,7 +6,9 @@ dsids, = glob_wildcards("{dsid}_phospho.rds")
 
 rule all:
     input:
-        "results/meta_substrate_site_regulon.rds", "results/meta_activity_site_regulon.rds", "results/meta_substrate_protein_regulon.rds", "results/meta_activity_protein_regulon.rds"
+        "results/meta_substrate_site_regulon.rds", "results/meta_activity_site_regulon.rds", "results/meta_substrate_protein_regulon.rds", "results/meta_activity_protein_regulon.rds",
+        "results/ddpimeta_substrate_site_regulon.rds", "results/dpimeta_activity_site_regulon.rds", "results/ddpimeta_substrate_protein_regulon.rds", "results/dpimeta_activity_protein_regulon.rds",
+        "results/hsmmeta_substrate_site_regulon.rds", "results/hsmmeta_activity_site_regulon.rds", "results/hsmmeta_substrate_protein_regulon.rds", "results/hsmmeta_activity_protein_regulon.rds"
 
 # prepare substrate regulon data
 rule prepare_substrate_regulon:
@@ -148,6 +150,52 @@ rule meta_substrate_regulon_generate:
     output:
         meta_site_regulons = "results/meta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/meta_substrate_protein_regulon.rds",
+    params:
+        minimum_targets = 10,
+        maximum_targets = 500,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 10,
+        ct_penalty = 20
+    threads: 4
+    singularity:
+        "phosphoviper.simg"
+    script:
+        "scripts/generate_meta_regulon.R"
+
+# generate dDPI-meta substrate regulons
+rule ddpimeta_substrate_regulon_generate:
+    input:
+        ref = rules.prepare_substrate_regulon.input.ref,
+        substrate_regulons = [],
+        regulons = expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids)
+    output:
+        meta_site_regulons = "results/ddpimeta_substrate_site_regulon.rds",
+        meta_protein_regulons = "results/ddpimeta_substrate_protein_regulon.rds",
+    params:
+        minimum_targets = 10,
+        maximum_targets = 500,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 10,
+        ct_penalty = 20
+    threads: 4
+    singularity:
+        "phosphoviper.simg"
+    script:
+        "scripts/generate_meta_regulon.R"
+
+# generate HSM-meta substrate regulons
+rule hsmmeta_substrate_regulon_generate:
+    input:
+        ref = rules.prepare_substrate_regulon.input.ref,
+        substrate_regulons = [],
+        regulons = expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids)
+    output:
+        meta_site_regulons = "results/hsmmeta_substrate_site_regulon.rds",
+        meta_protein_regulons = "results/hsmmeta_substrate_protein_regulon.rds",
     params:
         minimum_targets = 10,
         maximum_targets = 500,
@@ -310,6 +358,54 @@ rule meta_activity_regulon_generate:
     output:
         meta_site_regulons = "results/meta_activity_site_regulon.rds",
         meta_protein_regulons = "results/meta_activity_protein_regulon.rds",
+    params:
+        minimum_targets = 10,
+        maximum_targets = 500,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 10,
+        ct_penalty = 20
+    threads: 4
+    singularity:
+        "phosphoviper.simg"
+    script:
+        "scripts/generate_meta_regulon.R"
+
+# generate DPI-meta activity regulons
+rule dpimeta_activity_regulon_generate:
+    input:
+        ref = rules.prepare_substrate_regulon.input.ref,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        regulons = expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids),
+        fasta = "library.fasta"
+    output:
+        meta_site_regulons = "results/dpimeta_activity_site_regulon.rds",
+        meta_protein_regulons = "results/dpimeta_activity_protein_regulon.rds",
+    params:
+        minimum_targets = 10,
+        maximum_targets = 500,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 10,
+        ct_penalty = 20
+    threads: 4
+    singularity:
+        "phosphoviper.simg"
+    script:
+        "scripts/generate_meta_regulon.R"
+
+# generate HSM-meta activity regulons
+rule hsmmeta_activity_regulon_generate:
+    input:
+        ref = rules.prepare_substrate_regulon.input.ref,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        regulons = expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids),
+        fasta = "library.fasta"
+    output:
+        meta_site_regulons = "results/hsmmeta_activity_site_regulon.rds",
+        meta_protein_regulons = "results/hsmmeta_activity_protein_regulon.rds",
     params:
         minimum_targets = 10,
         maximum_targets = 500,
