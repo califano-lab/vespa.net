@@ -153,6 +153,7 @@ rule meta_substrate_regulon_generate:
     params:
         minimum_targets = 10,
         maximum_targets = 500,
+        fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
@@ -176,6 +177,7 @@ rule ddpimeta_substrate_regulon_generate:
     params:
         minimum_targets = 10,
         maximum_targets = 500,
+        fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
@@ -199,6 +201,7 @@ rule hsmmeta_substrate_regulon_generate:
     params:
         minimum_targets = 10,
         maximum_targets = 500,
+        fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
@@ -226,6 +229,8 @@ rule prepare_activity_regulon:
         matrix = "results/{dsid}/prepare_activity_regulon/matrix.txt"
     params:
         minimum_targets = 10,
+        maximum_targets = 500,
+        fill = "rowmin",
         hsm_threshold = 0.05,
         ct_correction = True,
         ct_regulators_threshold = 0.05,
@@ -361,6 +366,7 @@ rule meta_activity_regulon_generate:
     params:
         minimum_targets = 10,
         maximum_targets = 500,
+        fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
@@ -385,6 +391,7 @@ rule dpimeta_activity_regulon_generate:
     params:
         minimum_targets = 10,
         maximum_targets = 500,
+        fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
@@ -409,6 +416,7 @@ rule hsmmeta_activity_regulon_generate:
     params:
         minimum_targets = 10,
         maximum_targets = 500,
+        fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
