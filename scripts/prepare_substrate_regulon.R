@@ -4,10 +4,8 @@ library(phosphoviper)
 phospho<-readRDS(snakemake@input[["phospho"]])
 proteo<-readRDS(snakemake@input[["proteo"]])
 
-qml<-rbind(proteo, phospho, fill=TRUE)
-
 # check if proteo-level abundances are present
-if (snakemake@input[["phospho"]] == snakemake@input[["proteo"]]) {
+if (identical(phospho, proteo)) {
 	qml<-phospho
 } else {
 	qml<-rbind(proteo, phospho, fill=TRUE)

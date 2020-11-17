@@ -8,8 +8,9 @@ if (snakemake@params[["fill"]] == "NA") {
 }
 
 # import preprocessed data
+phospho<-readRDS(snakemake@input[["phospho"]])
 proteo<-readRDS(snakemake@input[["proteo"]])
-qmx<-export2mx(readRDS(snakemake@input[["phospho"]]), fillvalues = fillvalues)
+qmx<-export2mx(phospho, fillvalues = fillvalues)
 
 # import substrate regulon
 meta_substrate_regulons<-readRDS(snakemake@input[["meta_substrate_regulons"]])
@@ -22,7 +23,7 @@ vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(meta_subs
 pvl<-vmx2pv(vmx, fasta=snakemake@input[["fasta"]])
 
 # check if proteo-level abundances are present
-if (snakemake@input[["phospho"]] == snakemake@input[["proteo"]]) {
+if (identical(phospho, proteo)) {
 	yqml<-pvl
 } else {
 	yqml<-rbind(proteo, pvl, fill = TRUE)
