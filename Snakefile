@@ -90,8 +90,6 @@ rule ddpi_substrate_regulon_generate:
 # generate HSM/D regulon
 rule hsm_substrate_regulon_mit:
     input:
-        kinases = rules.prepare_substrate_regulon.output.kinases,
-        kinases_phosphatases = rules.prepare_substrate_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_substrate_regulon.output.phosphointeractions,
         targets = rules.prepare_substrate_regulon.output.targets,
         matrix = rules.prepare_substrate_regulon.output.matrix
@@ -101,12 +99,10 @@ rule hsm_substrate_regulon_mit:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -i {input.phosphointeractions} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_substrate_regulon_bs:
     input:
-        kinases = rules.prepare_substrate_regulon.output.kinases,
-        kinases_phosphatases = rules.prepare_substrate_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_substrate_regulon.output.phosphointeractions,
         targets = rules.prepare_substrate_regulon.output.targets,
         matrix = rules.prepare_substrate_regulon.output.matrix,
@@ -117,7 +113,7 @@ rule hsm_substrate_regulon_bs:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar --noDPI -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -i {input.phosphointeractions} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 --noDPI -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule hsm_substrate_regulon_consolidate:
     input:
@@ -304,7 +300,6 @@ rule dpi_activity_regulon_generate:
 # generate HSM/P regulon
 rule hsm_activity_regulon_mit:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
         targets = rules.prepare_activity_regulon.output.targets,
         matrix = rules.prepare_activity_regulon.output.matrix
@@ -314,11 +309,10 @@ rule hsm_activity_regulon_mit:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_activity_regulon_bs:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
         targets = rules.prepare_activity_regulon.output.targets,
         matrix = rules.prepare_activity_regulon.output.matrix,
@@ -329,7 +323,7 @@ rule hsm_activity_regulon_bs:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar --noDPI -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 --noDPI -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule hsm_activity_consolidate:
     input:

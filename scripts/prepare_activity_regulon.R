@@ -30,4 +30,4 @@ if (identical(phospho, proteo)) {
 }
 
 # export hpARACNe input files
-export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmpf, confidence_threshold = snakemake@params[["hsm_threshold"]], interaction_level = "activity")
+export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmp, confidence_threshold = snakemake@params[["hsm_threshold"]], interaction_level = "activity")
