@@ -24,7 +24,7 @@ rule prepare_substrate_regulon:
         peptides = "results/{dsid}/prepare_substrate_regulon/peptides.txt",
         matrix = "results/{dsid}/prepare_substrate_regulon/matrix.txt",
     params:
-        hsm_threshold = 0.05,
+        hsm_threshold = 0,
         restrict_peptides = False
     singularity:
         "phosphoviper.simg"
@@ -79,9 +79,6 @@ rule ddpi_substrate_regulon_generate:
         peptides = rules.prepare_substrate_regulon.output.peptides
     output:
         regulon = "results/{dsid}/ddpi_substrate_regulon.rds"
-    params:
-        likelihood_threshold = 0.5,
-        priors = False
     singularity:
         "phosphoviper.simg"
     script:
@@ -90,6 +87,8 @@ rule ddpi_substrate_regulon_generate:
 # generate HSM/D regulon
 rule hsm_substrate_regulon_mit:
     input:
+        kinases = rules.prepare_substrate_regulon.output.kinases,
+        kinases_phosphatases = rules.prepare_substrate_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_substrate_regulon.output.phosphointeractions,
         targets = rules.prepare_substrate_regulon.output.targets,
         matrix = rules.prepare_substrate_regulon.output.matrix
@@ -99,10 +98,12 @@ rule hsm_substrate_regulon_mit:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_substrate_regulon_bs:
     input:
+        kinases = rules.prepare_substrate_regulon.output.kinases,
+        kinases_phosphatases = rules.prepare_substrate_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_substrate_regulon.output.phosphointeractions,
         targets = rules.prepare_substrate_regulon.output.targets,
         matrix = rules.prepare_substrate_regulon.output.matrix,
@@ -113,7 +114,7 @@ rule hsm_substrate_regulon_bs:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 --noDPI -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -i {input.phosphointeractions} -tg {input.targets} --noDPI -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule hsm_substrate_regulon_consolidate:
     input:
@@ -133,9 +134,6 @@ rule hsm_substrate_regulon_generate:
         peptides = rules.prepare_substrate_regulon.output.peptides
     output:
         regulon = "results/{dsid}/hsm_substrate_regulon.rds"
-    params:
-        likelihood_threshold = 0.5,
-        priors = False
     singularity:
         "phosphoviper.simg"
     script:
@@ -151,8 +149,9 @@ rule meta_substrate_regulon_generate:
         meta_site_regulons = "results/meta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/meta_substrate_protein_regulon.rds",
     params:
-        minimum_targets = 10,
+        minimum_targets = 5,
         maximum_targets = 500,
+        adaptive = True,
         fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
@@ -175,8 +174,9 @@ rule ddpimeta_substrate_regulon_generate:
         meta_site_regulons = "results/ddpimeta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/ddpimeta_substrate_protein_regulon.rds",
     params:
-        minimum_targets = 10,
+        minimum_targets = 5,
         maximum_targets = 500,
+        adaptive = True,
         fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
@@ -199,8 +199,9 @@ rule hsmmeta_substrate_regulon_generate:
         meta_site_regulons = "results/hsmmeta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/hsmmeta_substrate_protein_regulon.rds",
     params:
-        minimum_targets = 10,
+        minimum_targets = 5,
         maximum_targets = 500,
+        adaptive = True,
         fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
@@ -228,10 +229,11 @@ rule prepare_activity_regulon:
         peptides = "results/{dsid}/prepare_activity_regulon/peptides.txt",
         matrix = "results/{dsid}/prepare_activity_regulon/matrix.txt"
     params:
-        minimum_targets = 10,
+        minimum_targets = 5,
         maximum_targets = 500,
+        adaptive = True,
         fill = "rowmin",
-        hsm_threshold = 0.05,
+        hsm_threshold = 0,
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
@@ -289,9 +291,6 @@ rule dpi_activity_regulon_generate:
         peptides = rules.prepare_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/dpi_activity_regulon.rds"
-    params:
-        likelihood_threshold = 0.5,
-        priors = False
     singularity:
         "phosphoviper.simg"
     script:
@@ -300,6 +299,7 @@ rule dpi_activity_regulon_generate:
 # generate HSM/P regulon
 rule hsm_activity_regulon_mit:
     input:
+        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
         targets = rules.prepare_activity_regulon.output.targets,
         matrix = rules.prepare_activity_regulon.output.matrix
@@ -309,10 +309,11 @@ rule hsm_activity_regulon_mit:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule hsm_activity_regulon_bs:
     input:
+        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
         phosphointeractions = rules.prepare_activity_regulon.output.phosphointeractions,
         targets = rules.prepare_activity_regulon.output.targets,
         matrix = rules.prepare_activity_regulon.output.matrix,
@@ -323,7 +324,7 @@ rule hsm_activity_regulon_bs:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 --noDPI -e {input.matrix} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -i {input.phosphointeractions} -tg {input.targets} --noDPI -o $(dirname {output}) -s $(basename {output.iteration}) -j {threads} && touch {output.iteration}"
 
 rule hsm_activity_consolidate:
     input:
@@ -343,9 +344,6 @@ rule hsm_activity_regulon_generate:
         peptides = rules.prepare_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/hsm_activity_regulon.rds"
-    params:
-        likelihood_threshold = 0.5,
-        priors = False
     singularity:
         "phosphoviper.simg"
     script:
@@ -362,8 +360,9 @@ rule meta_activity_regulon_generate:
         meta_site_regulons = "results/meta_activity_site_regulon.rds",
         meta_protein_regulons = "results/meta_activity_protein_regulon.rds",
     params:
-        minimum_targets = 10,
+        minimum_targets = 5,
         maximum_targets = 500,
+        adaptive = True,
         fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
@@ -387,8 +386,9 @@ rule dpimeta_activity_regulon_generate:
         meta_site_regulons = "results/dpimeta_activity_site_regulon.rds",
         meta_protein_regulons = "results/dpimeta_activity_protein_regulon.rds",
     params:
-        minimum_targets = 10,
+        minimum_targets = 5,
         maximum_targets = 500,
+        adaptive = True,
         fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,
@@ -412,8 +412,9 @@ rule hsmmeta_activity_regulon_generate:
         meta_site_regulons = "results/hsmmeta_activity_site_regulon.rds",
         meta_protein_regulons = "results/hsmmeta_activity_protein_regulon.rds",
     params:
-        minimum_targets = 10,
+        minimum_targets = 5,
         maximum_targets = 500,
+        adaptive = True,
         fill = "rowmin",
         ct_correction = True,
         ct_regulators_threshold = 0.05,

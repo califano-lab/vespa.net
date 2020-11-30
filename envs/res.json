@@ -7,11 +7,5 @@
         "name"      : "JOBNAME.{rule}.{wildcards}",
         "output"    : "logs/cluster/{rule}.{wildcards}.out",
         "error"     : "logs/cluster/{rule}.{wildcards}.err"
-    },
-
-    "hsm_substrate_regulon_bs" :
-    {
-    "memory"    : 16384,
-    "nCPUs"     : "4"
     }
 }

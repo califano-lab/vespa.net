@@ -17,7 +17,7 @@ meta_substrate_regulons<-readRDS(snakemake@input[["meta_substrate_regulons"]])
 print(meta_substrate_regulons)
 
 # run VIPER
-vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(meta_substrate_regulons, rownames(qmx), snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
+vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(meta_substrate_regulons, rownames(qmx), snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
 # convert to phosphoVIPER list
 pvl<-vmx2pv(vmx, fasta=snakemake@input[["fasta"]])
@@ -30,4 +30,4 @@ if (identical(phospho, proteo)) {
 }
 
 # export hpARACNe input files
-export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmp, confidence_threshold = snakemake@params[["hsm_threshold"]], interaction_level = "activity")
+export2hparacne(yqml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, hsmpf, confidence_threshold = snakemake@params[["hsm_threshold"]], restrict_interactions=TRUE, interaction_level = "activity")
