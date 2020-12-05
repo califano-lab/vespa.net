@@ -19,4 +19,4 @@ if (snakemake@params[["restrict_peptides"]]) {
 }
 
 # export hpARACNe input files
-export2hparacne(qml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, list("hsmp"=hsmpf,"pc"=pcdb,"lp"=lpsdb), target_sites, confidence_threshold = snakemake@params[["hsm_threshold"]], restrict_interactions=TRUE, interaction_level = "substrate")
+export2hparacne(qml, dirname(snakemake@output[["kinases"]]), kinases, phosphatases, list("hsm"=hsmpf,"pc"=pcdb,"lp"=lpsdb), target_sites, confidence_threshold = snakemake@params[["hsm_threshold"]], restrict_interactions=TRUE, interaction_level = "substrate")

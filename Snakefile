@@ -8,7 +8,9 @@ rule all:
     input:
         "results/meta_substrate_site_regulon.rds", "results/meta_activity_site_regulon.rds", "results/meta_substrate_protein_regulon.rds", "results/meta_activity_protein_regulon.rds",
         "results/ddpimeta_substrate_site_regulon.rds", "results/dpimeta_activity_site_regulon.rds", "results/ddpimeta_substrate_protein_regulon.rds", "results/dpimeta_activity_protein_regulon.rds",
-        "results/hsmmeta_substrate_site_regulon.rds", "results/hsmmeta_activity_site_regulon.rds", "results/hsmmeta_substrate_protein_regulon.rds", "results/hsmmeta_activity_protein_regulon.rds"
+        "results/hsmmeta_substrate_site_regulon.rds", "results/hsmmeta_activity_site_regulon.rds", "results/hsmmeta_substrate_protein_regulon.rds", "results/hsmmeta_activity_protein_regulon.rds",
+        "results/pcmeta_substrate_site_regulon.rds", "results/pcmeta_activity_site_regulon.rds", "results/pcmeta_substrate_protein_regulon.rds", "results/pcmeta_activity_protein_regulon.rds",
+        "results/lpmeta_substrate_site_regulon.rds", "results/lpmeta_activity_site_regulon.rds", "results/lpmeta_substrate_protein_regulon.rds", "results/lpmeta_activity_protein_regulon.rds"
 
 # prepare substrate regulon data
 rule prepare_substrate_regulon:
@@ -256,7 +258,7 @@ rule meta_substrate_regulon_generate:
     input:
         ref = rules.prepare_substrate_regulon.input.ref,
         substrate_regulons = [],
-        regulons = [expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids) expand("results/{dsid}/pc_substrate_regulon.rds", dsid=dsids) expand("results/{dsid}/lp_substrate_regulon.rds", dsid=dsids)]
+        regulons = [expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/pc_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/lp_substrate_regulon.rds", dsid=dsids)]
     output:
         meta_site_regulons = "results/meta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/meta_substrate_protein_regulon.rds",
