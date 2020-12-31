@@ -17,7 +17,7 @@ rule prepare_substrate_regulon:
     input:
         phospho = "{dsid}_phospho.rds",
         proteo = "{dsid}_proteo.rds",
-        ref = "reference.rds"
+        #ref = "reference.rds" # Uncomment if restrict_peptides = True
     output:
         kinases = "results/{dsid}/prepare_substrate_regulon/kinases.txt",
         kinases_phosphatases = "results/{dsid}/prepare_substrate_regulon/kinases_phosphatases.txt",
@@ -48,7 +48,7 @@ rule ddpi_substrate_regulon_mit:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
+        "java -Xmx28G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
 rule ddpi_substrate_regulon_bs:
     input:
@@ -256,7 +256,7 @@ rule lp_substrate_regulon_generate:
 # generate meta substrate regulons
 rule meta_substrate_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = "reference.rds",
         substrate_regulons = [],
         regulons = [expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/pc_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/lp_substrate_regulon.rds", dsid=dsids)]
     output:
@@ -281,7 +281,7 @@ rule meta_substrate_regulon_generate:
 # generate dDPI-meta substrate regulons
 rule ddpimeta_substrate_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = [],
         regulons = expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids)
     output:
@@ -306,7 +306,7 @@ rule ddpimeta_substrate_regulon_generate:
 # generate HSM-meta substrate regulons
 rule hsmmeta_substrate_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = [],
         regulons = expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids)
     output:
@@ -331,7 +331,7 @@ rule hsmmeta_substrate_regulon_generate:
 # generate PC-meta substrate regulons
 rule pcmeta_substrate_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = [],
         regulons = expand("results/{dsid}/pc_substrate_regulon.rds", dsid=dsids)
     output:
@@ -356,7 +356,7 @@ rule pcmeta_substrate_regulon_generate:
 # generate LP-meta substrate regulons
 rule lpmeta_substrate_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = [],
         regulons = expand("results/{dsid}/lp_substrate_regulon.rds", dsid=dsids)
     output:
@@ -624,7 +624,7 @@ rule lp_activity_regulon_generate:
 # generate meta activity regulons
 rule meta_activity_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = [expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/pc_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/lp_activity_regulon.rds", dsid=dsids)],
         fasta = "library.fasta"
@@ -650,7 +650,7 @@ rule meta_activity_regulon_generate:
 # generate DPI-meta activity regulons
 rule dpimeta_activity_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
@@ -676,7 +676,7 @@ rule dpimeta_activity_regulon_generate:
 # generate HSM-meta activity regulons
 rule hsmmeta_activity_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
@@ -702,7 +702,7 @@ rule hsmmeta_activity_regulon_generate:
 # generate PC-meta activity regulons
 rule pcmeta_activity_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/pc_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
@@ -728,7 +728,7 @@ rule pcmeta_activity_regulon_generate:
 # generate LP-meta activity regulons
 rule lpmeta_activity_regulon_generate:
     input:
-        ref = rules.prepare_substrate_regulon.input.ref,
+        ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/lp_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"

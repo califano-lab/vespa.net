@@ -7,5 +7,20 @@
         "name"      : "JOBNAME.{rule}.{wildcards}",
         "output"    : "logs/cluster/{rule}.{wildcards}.out",
         "error"     : "logs/cluster/{rule}.{wildcards}.err"
+    },
+
+    "prepare_substrate_regulon" :
+    {
+        "nCPUs"     : "1",
+        "memory"    : 65536,
+        "resources" : "\"rusage[mem=65536,scratch=8192]\"",
+    },
+
+    "ddpi_substrate_regulon_mit" :
+    {
+        "nCPUs"     : "1",
+        "memory"    : 32768,
+        "resources" : "\"rusage[mem=32768,scratch=8192]\"",
     }
+
 }
