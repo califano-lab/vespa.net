@@ -1,5 +1,6 @@
 library(viper)
 library(phosphoviper)
+library(phosphoviper.db)
 
 if (snakemake@params[["fill"]] == "NA") {
 	fillvalues<-NA
