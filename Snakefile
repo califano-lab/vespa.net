@@ -1,3 +1,5 @@
+# phosphoviper.net version 1.0.2
+
 # number of ARACNe bootstrap iterations
 seed = list(range(1,201))
 
@@ -260,6 +262,7 @@ rule meta_substrate_regulon_generate:
         substrate_regulons = [],
         regulons = [expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/pc_substrate_regulon.rds", dsid=dsids), expand("results/{dsid}/lp_substrate_regulon.rds", dsid=dsids)]
     output:
+        meta_redundantsite_regulons = "results/meta_substrate_redundantsite_regulon.rds",
         meta_site_regulons = "results/meta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/meta_substrate_protein_regulon.rds",
     params:
@@ -271,7 +274,8 @@ rule meta_substrate_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -285,6 +289,7 @@ rule ddpimeta_substrate_regulon_generate:
         substrate_regulons = [],
         regulons = expand("results/{dsid}/ddpi_substrate_regulon.rds", dsid=dsids)
     output:
+        meta_redundantsite_regulons = "results/ddpimeta_substrate_redundantsite_regulon.rds",
         meta_site_regulons = "results/ddpimeta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/ddpimeta_substrate_protein_regulon.rds",
     params:
@@ -296,7 +301,8 @@ rule ddpimeta_substrate_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -310,6 +316,7 @@ rule hsmmeta_substrate_regulon_generate:
         substrate_regulons = [],
         regulons = expand("results/{dsid}/hsm_substrate_regulon.rds", dsid=dsids)
     output:
+        meta_redundantsite_regulons = "results/hsmmeta_substrate_redundantsite_regulon.rds",
         meta_site_regulons = "results/hsmmeta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/hsmmeta_substrate_protein_regulon.rds",
     params:
@@ -321,7 +328,8 @@ rule hsmmeta_substrate_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -335,6 +343,7 @@ rule pcmeta_substrate_regulon_generate:
         substrate_regulons = [],
         regulons = expand("results/{dsid}/pc_substrate_regulon.rds", dsid=dsids)
     output:
+        meta_redundantsite_regulons = "results/pcmeta_substrate_redundantsite_regulon.rds",
         meta_site_regulons = "results/pcmeta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/pcmeta_substrate_protein_regulon.rds",
     params:
@@ -346,7 +355,8 @@ rule pcmeta_substrate_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -360,6 +370,7 @@ rule lpmeta_substrate_regulon_generate:
         substrate_regulons = [],
         regulons = expand("results/{dsid}/lp_substrate_regulon.rds", dsid=dsids)
     output:
+        meta_redundantsite_regulons = "results/lpmeta_substrate_redundantsite_regulon.rds",
         meta_site_regulons = "results/lpmeta_substrate_site_regulon.rds",
         meta_protein_regulons = "results/lpmeta_substrate_protein_regulon.rds",
     params:
@@ -371,7 +382,8 @@ rule lpmeta_substrate_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -383,7 +395,7 @@ rule prepare_activity_regulon:
     input:
         phospho = "{dsid}_phospho.rds",
         proteo = "{dsid}_proteo.rds",
-        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
         fasta = "library.fasta"
     output:
         kinases = "results/{dsid}/prepare_activity_regulon/kinases.txt",
@@ -625,10 +637,11 @@ rule lp_activity_regulon_generate:
 rule meta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
         regulons = [expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/pc_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/lp_activity_regulon.rds", dsid=dsids)],
         fasta = "library.fasta"
     output:
+        meta_redundantsite_regulons = "results/meta_activity_redundantsite_regulon.rds",
         meta_site_regulons = "results/meta_activity_site_regulon.rds",
         meta_protein_regulons = "results/meta_activity_protein_regulon.rds",
     params:
@@ -640,7 +653,8 @@ rule meta_activity_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -651,10 +665,11 @@ rule meta_activity_regulon_generate:
 rule dpimeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
         regulons = expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
+        meta_redundantsite_regulons = "results/dpimeta_activity_redundantsite_regulon.rds",
         meta_site_regulons = "results/dpimeta_activity_site_regulon.rds",
         meta_protein_regulons = "results/dpimeta_activity_protein_regulon.rds",
     params:
@@ -666,7 +681,8 @@ rule dpimeta_activity_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -677,10 +693,11 @@ rule dpimeta_activity_regulon_generate:
 rule hsmmeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
         regulons = expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
+        meta_redundantsite_regulons = "results/hsmmeta_activity_redundantsite_regulon.rds",
         meta_site_regulons = "results/hsmmeta_activity_site_regulon.rds",
         meta_protein_regulons = "results/hsmmeta_activity_protein_regulon.rds",
     params:
@@ -692,7 +709,8 @@ rule hsmmeta_activity_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -703,10 +721,11 @@ rule hsmmeta_activity_regulon_generate:
 rule pcmeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
         regulons = expand("results/{dsid}/pc_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
+        meta_redundantsite_regulons = "results/pcmeta_activity_redundantsite_regulon.rds",
         meta_site_regulons = "results/pcmeta_activity_site_regulon.rds",
         meta_protein_regulons = "results/pcmeta_activity_protein_regulon.rds",
     params:
@@ -718,7 +737,8 @@ rule pcmeta_activity_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -729,10 +749,11 @@ rule pcmeta_activity_regulon_generate:
 rule lpmeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
         regulons = expand("results/{dsid}/lp_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
+        meta_redundantsite_regulons = "results/lpmeta_activity_redundantsite_regulon.rds",
         meta_site_regulons = "results/lpmeta_activity_site_regulon.rds",
         meta_protein_regulons = "results/lpmeta_activity_protein_regulon.rds",
     params:
@@ -744,7 +765,8 @@ rule lpmeta_activity_regulon_generate:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        orthogonal_cutoff = 0.5
     threads: 4
     singularity:
         "phosphoviper.simg"
