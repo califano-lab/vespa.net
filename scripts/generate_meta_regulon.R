@@ -34,7 +34,7 @@ if(length(single_regulons)>1) {
 }
 
 # generate non-redundant, non-correlated site-level regulons
-meta_site_regulons<-orthogonalRegulon(vmxa, meta_redundantsite_regulons, min_size=snakemake@params[["minimum_targets"]], min_size=snakemake@params[["orthogonal_cutoff"]])
+meta_site_regulons<-orthogonalRegulon(vmxa, meta_redundantsite_regulons, min_size=snakemake@params[["minimum_targets"]], cutoff=snakemake@params[["orthogonal_cutoff"]])
 
 # generate protein-level regulons
 meta_protein_regulons<-optimizeRegulon(vmxa, regulator2protein(meta_redundantsite_regulons), min_size=snakemake@params[["minimum_targets"]])
