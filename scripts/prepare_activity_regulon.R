@@ -1,6 +1,7 @@
 library(viper)
 library(phosphoviper)
 library(phosphoviper.db)
+library(stringr)
 
 if (snakemake@params[["fill"]] == "NA") {
 	fillvalues<-NA
@@ -21,7 +22,11 @@ print(meta_substrate_regulons)
 vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(meta_substrate_regulons, rownames(qmx), snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
 # convert to phosphoVIPER list
-pvl<-vmx2pv(vmx, fasta=snakemake@input[["fasta"]])
+if (str_detect(rownames(vmx)[1],":")) {
+        pvl<-vmx2pv(vmx, fasta=NULL)
+} else {
+        pvl<-vmx2pv(vmx, fasta=snakemake@input[["fasta"]])
+}
 
 # check if proteo-level abundances are present
 if (identical(phospho, proteo)) {

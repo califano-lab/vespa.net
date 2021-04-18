@@ -1,5 +1,6 @@
 library(viper)
 library(phosphoviper)
+library(stringr)
 
 if (snakemake@params[["fill"]] == "NA") {
 	fillvalues<-NA
@@ -15,7 +16,11 @@ if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 	substrate_regulons<-readRDS(snakemake@input[["substrate_regulons"]])
 	vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(substrate_regulons, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
-	vmxa<-export2mx(vmx2pv(vmx, fasta=snakemake@input[["fasta"]]), fillvalues = fillvalues)
+	if (str_detect(rownames(vmx)[1],":")) {
+		vmxa<-export2mx(vmx2pv(vmx, fasta=NULL), fillvalues = fillvalues)
+	} else {
+		vmxa<-export2mx(vmx2pv(vmx, fasta=snakemake@input[["fasta"]]), fillvalues = fillvalues)
+	}
 } else {
 	vmxa<-qmx
 }
