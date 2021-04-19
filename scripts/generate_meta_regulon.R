@@ -25,6 +25,9 @@ if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 	vmxa<-qmx
 }
 
+# compute VIPER signature
+vmxa_sig<-viperSignature(vmxa, vmxa, per=1000)
+
 # import single regulons
 single_regulons<-snakemake@input[["regulons"]]
 
@@ -33,16 +36,16 @@ if(length(single_regulons)>1) {
 	combined_regulons<-sapply(single_regulons, function(X){phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])})
 
 	# combine and optimize regulons
-	meta_redundantsite_regulons<-optimizeRegulon(vmxa, combined_regulons, min_size=snakemake@params[["minimum_targets"]])
+	meta_redundantsite_regulons<-optimizeRegulon(vmxa_sig, combined_regulons)
 } else {
 	meta_redundantsite_regulons<-phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(readRDS(single_regulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])
 }
 
 # generate non-redundant, non-correlated site-level regulons
-meta_site_regulons<-orthogonalRegulon(vmxa, meta_redundantsite_regulons, min_size=snakemake@params[["minimum_targets"]], cutoff=snakemake@params[["orthogonal_cutoff"]])
+meta_site_regulons<-orthogonalRegulon(vmxa_sig, meta_redundantsite_regulons, cutoff=snakemake@params[["orthogonal_cutoff"]])
 
 # generate protein-level regulons
-meta_protein_regulons<-optimizeRegulon(vmxa, regulator2protein(meta_redundantsite_regulons), min_size=snakemake@params[["minimum_targets"]])
+meta_protein_regulons<-optimizeRegulon(vmxa_sig, regulator2protein(meta_redundantsite_regulons))
 
 # save meta regulons
 saveRDS(meta_redundantsite_regulons, snakemake@output[["meta_redundantsite_regulons"]])

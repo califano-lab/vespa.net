@@ -76,7 +76,7 @@ rule ddpi_substrate_regulon_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule ddpi_substrate_regulon_generate:
     input:
@@ -131,7 +131,7 @@ rule hsm_substrate_regulon_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule hsm_substrate_regulon_generate:
     input:
@@ -186,7 +186,7 @@ rule pc_substrate_regulon_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule pc_substrate_regulon_generate:
     input:
@@ -241,7 +241,7 @@ rule lp_substrate_regulon_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule lp_substrate_regulon_generate:
     input:
@@ -395,7 +395,7 @@ rule prepare_activity_regulon:
     input:
         phospho = "{dsid}_phospho.rds",
         proteo = "{dsid}_proteo.rds",
-        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
+        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         fasta = "library.fasta"
     output:
         kinases = "results/{dsid}/prepare_activity_regulon/kinases.txt",
@@ -460,7 +460,7 @@ rule dpi_activity_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule dpi_activity_regulon_generate:
     input:
@@ -513,7 +513,7 @@ rule hsm_activity_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule hsm_activity_regulon_generate:
     input:
@@ -566,7 +566,7 @@ rule pc_activity_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule pc_activity_regulon_generate:
     input:
@@ -619,7 +619,7 @@ rule lp_activity_consolidate:
     singularity:
         "aracne.simg"
     shell:
-        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads}"
+        "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
 rule lp_activity_regulon_generate:
     input:
@@ -637,7 +637,7 @@ rule lp_activity_regulon_generate:
 rule meta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = [expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/pc_activity_regulon.rds", dsid=dsids), expand("results/{dsid}/lp_activity_regulon.rds", dsid=dsids)],
         fasta = "library.fasta"
     output:
@@ -665,7 +665,7 @@ rule meta_activity_regulon_generate:
 rule dpimeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
@@ -693,7 +693,7 @@ rule dpimeta_activity_regulon_generate:
 rule hsmmeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
@@ -721,7 +721,7 @@ rule hsmmeta_activity_regulon_generate:
 rule pcmeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/pc_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
@@ -749,7 +749,7 @@ rule pcmeta_activity_regulon_generate:
 rule lpmeta_activity_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_site_regulons,
+        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/lp_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
