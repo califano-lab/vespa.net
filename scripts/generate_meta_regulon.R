@@ -28,8 +28,10 @@ if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 
 # compute VIPER signature if controls are present
 if ("control" %in% colnames(refmx)) {
+	target_runs<-unique(subset(refmx, control == FALSE)$run_id)
 	control_runs<-unique(subset(refmx, control == TRUE)$run_id)
-	vmxa_sig<-viperSignature(vmxa[,-control_runs], vmxa[,control_runs], per=1000)
+
+	vmxa_sig<-viperSignature(vmxa[,target_runs], vmxa[,control_runs], per=1000)
 } else {
 	vmxa_sig<-vmxa
 }
