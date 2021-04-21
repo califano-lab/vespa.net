@@ -9,7 +9,8 @@ if (snakemake@params[["fill"]] == "NA") {
 }
 
 # import preprocessed data
-qmx<-export2mx(readRDS(snakemake@input[["ref"]]), fillvalues = fillvalues)
+refmx<-readRDS(snakemake@input[["ref"]])
+qmx<-export2mx(refmx, fillvalues = fillvalues)
 
 # compute substrate-level VIPER matrix
 if (length(snakemake@input[["substrate_regulons"]]) == 1) {
@@ -25,6 +26,14 @@ if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 	vmxa<-qmx
 }
 
+# compute VIPER signature if controls are present
+if ("control" %in% colnames(refmx)) {
+	control_runs<-unique(subset(refmx, control == TRUE)$run_id)
+	vmxa_sig<-viperSignature(vmxa[,-control_runs], vmxa[,control_runs], per=1000)
+} else {
+	vmxa_sig<-vmxa
+}
+
 # import single regulons
 single_regulons<-snakemake@input[["regulons"]]
 
@@ -33,16 +42,16 @@ if(length(single_regulons)>1) {
 	combined_regulons<-sapply(single_regulons, function(X){phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])})
 
 	# combine and optimize regulons
-	meta_redundantsite_regulons<-optimizeRegulon(vmxa, combined_regulons)
+	meta_redundantsite_regulons<-optimizeRegulon(vmxa_sig, combined_regulons)
 } else {
 	meta_redundantsite_regulons<-phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(readRDS(single_regulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])
 }
 
 # generate non-redundant, non-correlated site-level regulons
-meta_site_regulons<-orthogonalRegulon(vmxa, meta_redundantsite_regulons, cutoff=snakemake@params[["orthogonal_cutoff"]])
+meta_site_regulons<-orthogonalRegulon(vmxa_sig, meta_redundantsite_regulons, cutoff=snakemake@params[["orthogonal_cutoff"]])
 
 # generate protein-level regulons
-meta_protein_regulons<-optimizeRegulon(vmxa, regulator2protein(meta_redundantsite_regulons))
+meta_protein_regulons<-optimizeRegulon(vmxa_sig, regulator2protein(meta_redundantsite_regulons))
 
 # save meta regulons
 saveRDS(meta_redundantsite_regulons, snakemake@output[["meta_redundantsite_regulons"]])
