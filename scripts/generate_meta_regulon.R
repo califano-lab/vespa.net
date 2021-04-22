@@ -2,6 +2,16 @@ library(viper)
 library(phosphoviper)
 library(stringr)
 
+rank_normalize_mx<-function(qmn) {
+  # rank based normalization of the matrix
+  qmn.d1 <- t(t(apply(qmn, 2, rank, na.last = "keep"))/(colSums(!is.na(qmn)) + 1))
+  
+  # rank based estimation of single sample gene expression signature across the matrix
+  qmn.norm <- t(apply(qmn.d1, 1, rank, na.last = "keep"))/(rowSums(!is.na(qmn.d1)) + 1)
+
+  return(qmn.norm)
+}
+
 if (snakemake@params[["fill"]] == "NA") {
 	fillvalues<-NA
 } else {
@@ -14,6 +24,11 @@ qmx<-export2mx(refmx, fillvalues = fillvalues)
 
 # compute substrate-level VIPER matrix
 if (length(snakemake@input[["substrate_regulons"]]) == 1) {
+	# rank normalize matrix
+	if (snakemake@params[["rank_normalize"]]) {
+		qmx<-rank_normalize_mx(qmx)
+	}
+
 	substrate_regulons<-readRDS(snakemake@input[["substrate_regulons"]])
 	vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(substrate_regulons, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
@@ -24,6 +39,11 @@ if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 	}
 } else {
 	vmxa<-qmx
+}
+
+# rank normalize matrix
+if (snakemake@params[["rank_normalize"]]) {
+	vmxa<-rank_normalize_mx(vmxa)
 }
 
 # compute VIPER signature if controls are present
