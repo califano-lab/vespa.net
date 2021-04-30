@@ -2,14 +2,20 @@ library(viper)
 library(phosphoviper)
 library(stringr)
 
-rank_normalize_mx<-function(qmn) {
+rn_mx<-function(qmx) {
   # rank based normalization of the matrix
-  qmn.d1 <- t(t(apply(qmn, 2, rank, na.last = "keep"))/(colSums(!is.na(qmn)) + 1))
+  qmn.d1 <- t(t(apply(qmx, 2, rank, na.last = "keep"))/(colSums(!is.na(qmx)) + 1))
   
   # rank based estimation of single sample gene expression signature across the matrix
   qmn.norm <- t(apply(qmn.d1, 1, rank, na.last = "keep"))/(rowSums(!is.na(qmn.d1)) + 1)
 
   return(qmn.norm)
+}
+
+zscore_mx<-function(qmn) {
+	qmn<-t(apply(t(qmx),2,function(X){return((X-mean(X))/sd(X))}))
+
+	return(qmn)
 }
 
 if (snakemake@params[["fill"]] == "NA") {
@@ -24,9 +30,11 @@ qmx<-export2mx(refmx, fillvalues = fillvalues)
 
 # compute substrate-level VIPER matrix
 if (length(snakemake@input[["substrate_regulons"]]) == 1) {
-	# rank normalize matrix
-	if (snakemake@params[["rank_normalize"]]) {
-		qmx<-rank_normalize_mx(qmx)
+	# transform matrix
+	if (snakemake@params[["transform"]]=="rank") {
+		qmx<-rn_mx(qmx)
+	} else if (snakemake@params[["transform"]]=="zscore") {
+		qmx<-zscore_mx(qmx)
 	}
 
 	substrate_regulons<-readRDS(snakemake@input[["substrate_regulons"]])
@@ -41,9 +49,11 @@ if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 	vmxa<-qmx
 }
 
-# rank normalize matrix
-if (snakemake@params[["rank_normalize"]]) {
-	vmxa<-rank_normalize_mx(vmxa)
+# transform matrix
+if (snakemake@params[["transform"]]=="rank") {
+	vmxa<-rn_mx(vmxa)
+} else if (snakemake@params[["transform"]]=="zscore") {
+	vmxa<-zscore_mx(vmxa)
 }
 
 # compute VIPER signature if controls are present

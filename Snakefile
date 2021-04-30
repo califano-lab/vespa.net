@@ -276,7 +276,7 @@ rule meta_substrate_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -304,7 +304,7 @@ rule ddpimeta_substrate_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -332,7 +332,7 @@ rule hsmmeta_substrate_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -360,7 +360,7 @@ rule pcmeta_substrate_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -388,7 +388,7 @@ rule lpmeta_substrate_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -660,7 +660,7 @@ rule meta_activity_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -689,7 +689,7 @@ rule dpimeta_activity_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -718,7 +718,7 @@ rule hsmmeta_activity_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -747,7 +747,7 @@ rule pcmeta_activity_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
@@ -776,7 +776,7 @@ rule lpmeta_activity_regulon_generate:
         ct_minimum_targets = 5,
         ct_penalty = 20,
         orthogonal_cutoff = 0.5,
-        rank_normalize = True
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
