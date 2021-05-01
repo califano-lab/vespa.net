@@ -12,7 +12,7 @@ rn_mx<-function(qmx) {
   return(qmn.norm)
 }
 
-zscore_mx<-function(qmn) {
+zscore_mx<-function(qmx) {
 	qmn<-t(apply(t(qmx),2,function(X){return((X-mean(X))/sd(X))}))
 
 	return(qmn)

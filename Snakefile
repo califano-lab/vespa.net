@@ -421,7 +421,8 @@ rule prepare_activity_regulon:
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
         ct_minimum_targets = 5,
-        ct_penalty = 20
+        ct_penalty = 20,
+        transform = "zscore"
     threads: 4
     singularity:
         "phosphoviper.simg"
