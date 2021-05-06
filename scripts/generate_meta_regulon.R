@@ -13,7 +13,7 @@ rn_mx<-function(qmx) {
 }
 
 zscore_mx<-function(qmx) {
-	qmn<-t(apply(t(qmx),2,function(X){return((X-mean(X))/sd(X))}))
+	qmn<-t(apply(t(qmx),2,function(X){return((X-mean(X, na.rm=TRUE))/sd(X, na.rm=TRUE))}))
 
 	return(qmn)
 }
@@ -30,13 +30,6 @@ qmx<-export2mx(refmx, fillvalues = fillvalues)
 
 # compute substrate-level VIPER matrix
 if (length(snakemake@input[["substrate_regulons"]]) == 1) {
-	# transform matrix
-	if (snakemake@params[["transform"]]=="rank") {
-		qmx<-rn_mx(qmx)
-	} else if (snakemake@params[["transform"]]=="zscore") {
-		qmx<-zscore_mx(qmx)
-	}
-
 	substrate_regulons<-readRDS(snakemake@input[["substrate_regulons"]])
 	vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(substrate_regulons, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
