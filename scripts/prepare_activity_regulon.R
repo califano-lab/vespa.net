@@ -3,6 +3,12 @@ library(phosphoviper)
 library(phosphoviper.db)
 library(stringr)
 
+if (snakemake@params[["fill"]] == "NA") {
+    fillvalues<-NA
+} else {
+    fillvalues<-snakemake@params[["fill"]]
+}
+
 # import preprocessed data
 phospho<-readRDS(snakemake@input[["phospho"]])
 proteo<-readRDS(snakemake@input[["proteo"]])
