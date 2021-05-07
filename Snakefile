@@ -395,22 +395,22 @@ rule lpmeta_substrate_regulon_generate:
     script:
         "scripts/generate_meta_regulon.R"
 
-# prepare activity regulon data
-rule prepare_activity_regulon:
+# prepare DPI activity regulon data
+rule prepare_dpi_activity_regulon:
     input:
         phospho = "{dsid}_phospho.rds",
         proteo = "{dsid}_proteo.rds",
-        meta_substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        meta_substrate_regulons = rules.ddpimeta_substrate_regulon_generate.output.meta_protein_regulons,
         fasta = "library.fasta"
     output:
-        kinases = "results/{dsid}/prepare_activity_regulon/kinases.txt",
-        kinases_phosphatases = "results/{dsid}/prepare_activity_regulon/kinases_phosphatases.txt",
-        targets = "results/{dsid}/prepare_activity_regulon/targets.txt",
-        hsm_phosphointeractions = "results/{dsid}/prepare_activity_regulon/hsm_phosphointeractions.txt",
-        pc_phosphointeractions = "results/{dsid}/prepare_activity_regulon/pc_phosphointeractions.txt",
-        lp_phosphointeractions = "results/{dsid}/prepare_activity_regulon/lp_phosphointeractions.txt",
-        peptides = "results/{dsid}/prepare_activity_regulon/peptides.txt",
-        matrix = "results/{dsid}/prepare_activity_regulon/matrix.txt"
+        kinases = "results/{dsid}/prepare_dpi_activity_regulon/kinases.txt",
+        kinases_phosphatases = "results/{dsid}/prepare_dpi_activity_regulon/kinases_phosphatases.txt",
+        targets = "results/{dsid}/prepare_dpi_activity_regulon/targets.txt",
+        hsm_phosphointeractions = "results/{dsid}/prepare_dpi_activity_regulon/hsm_phosphointeractions.txt",
+        pc_phosphointeractions = "results/{dsid}/prepare_dpi_activity_regulon/pc_phosphointeractions.txt",
+        lp_phosphointeractions = "results/{dsid}/prepare_dpi_activity_regulon/lp_phosphointeractions.txt",
+        peptides = "results/{dsid}/prepare_dpi_activity_regulon/peptides.txt",
+        matrix = "results/{dsid}/prepare_dpi_activity_regulon/matrix.txt"
     params:
         minimum_targets = 5,
         maximum_targets = 500,
@@ -431,9 +431,9 @@ rule prepare_activity_regulon:
 # generate DPI regulon
 rule dpi_activity_regulon_mit:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix
+        kinases_phosphatases = rules.prepare_dpi_activity_regulon.output.kinases_phosphatases,
+        targets = rules.prepare_dpi_activity_regulon.output.targets,
+        matrix = rules.prepare_dpi_activity_regulon.output.matrix
     output:
         mit = "results/{dsid}/dpi_activity_regulon/fwer_computed.txt"
     threads: 1
@@ -444,9 +444,9 @@ rule dpi_activity_regulon_mit:
 
 rule dpi_activity_regulon_bs:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix,
+        kinases_phosphatases = rules.prepare_dpi_activity_regulon.output.kinases_phosphatases,
+        targets = rules.prepare_dpi_activity_regulon.output.targets,
+        matrix = rules.prepare_dpi_activity_regulon.output.matrix,
         mit = rules.dpi_activity_regulon_mit.output.mit
     output:
         iteration = temp("results/{dsid}/dpi_activity_regulon/{seed}")
@@ -470,8 +470,8 @@ rule dpi_activity_consolidate:
 rule dpi_activity_regulon_generate:
     input:
         network = rules.dpi_activity_consolidate.output.network,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        peptides = rules.prepare_activity_regulon.output.peptides
+        matrix = rules.prepare_dpi_activity_regulon.output.matrix,
+        peptides = rules.prepare_dpi_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/dpi_activity_regulon.rds"
     singularity:
@@ -479,13 +479,46 @@ rule dpi_activity_regulon_generate:
     script:
         "scripts/generate_regulon.R"
 
+# prepare DPI activity regulon data
+rule prepare_hsm_activity_regulon:
+    input:
+        phospho = "{dsid}_phospho.rds",
+        proteo = "{dsid}_proteo.rds",
+        meta_substrate_regulons = rules.hsmmeta_substrate_regulon_generate.output.meta_protein_regulons,
+        fasta = "library.fasta"
+    output:
+        kinases = "results/{dsid}/prepare_hsm_activity_regulon/kinases.txt",
+        kinases_phosphatases = "results/{dsid}/prepare_hsm_activity_regulon/kinases_phosphatases.txt",
+        targets = "results/{dsid}/prepare_hsm_activity_regulon/targets.txt",
+        hsm_phosphointeractions = "results/{dsid}/prepare_hsm_activity_regulon/hsm_phosphointeractions.txt",
+        pc_phosphointeractions = "results/{dsid}/prepare_hsm_activity_regulon/pc_phosphointeractions.txt",
+        lp_phosphointeractions = "results/{dsid}/prepare_hsm_activity_regulon/lp_phosphointeractions.txt",
+        peptides = "results/{dsid}/prepare_hsm_activity_regulon/peptides.txt",
+        matrix = "results/{dsid}/prepare_hsm_activity_regulon/matrix.txt"
+    params:
+        minimum_targets = 5,
+        maximum_targets = 500,
+        adaptive = True,
+        fill = "rowmin",
+        hsm_threshold = 0,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 5,
+        ct_penalty = 20
+    threads: 4
+    singularity:
+        "phosphoviper.simg"
+    script:
+        "scripts/prepare_activity_regulon.R"
+
 # generate HSM/P regulon
 rule hsm_activity_regulon_mit:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        phosphointeractions = rules.prepare_activity_regulon.output.hsm_phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix
+        kinases_phosphatases = rules.prepare_hsm_activity_regulon.output.kinases_phosphatases,
+        phosphointeractions = rules.prepare_hsm_activity_regulon.output.hsm_phosphointeractions,
+        targets = rules.prepare_hsm_activity_regulon.output.targets,
+        matrix = rules.prepare_hsm_activity_regulon.output.matrix
     output:
         mit = "results/{dsid}/hsm_activity_regulon/fwer_computed.txt"
     threads: 1
@@ -496,10 +529,10 @@ rule hsm_activity_regulon_mit:
 
 rule hsm_activity_regulon_bs:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        phosphointeractions = rules.prepare_activity_regulon.output.hsm_phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix,
+        kinases_phosphatases = rules.prepare_hsm_activity_regulon.output.kinases_phosphatases,
+        phosphointeractions = rules.prepare_hsm_activity_regulon.output.hsm_phosphointeractions,
+        targets = rules.prepare_hsm_activity_regulon.output.targets,
+        matrix = rules.prepare_hsm_activity_regulon.output.matrix,
         mit = rules.hsm_activity_regulon_mit.output.mit
     output:
         iteration = temp("results/{dsid}/hsm_activity_regulon/{seed}")
@@ -523,8 +556,8 @@ rule hsm_activity_consolidate:
 rule hsm_activity_regulon_generate:
     input:
         network = rules.hsm_activity_consolidate.output.network,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        peptides = rules.prepare_activity_regulon.output.peptides
+        matrix = rules.prepare_hsm_activity_regulon.output.matrix,
+        peptides = rules.prepare_hsm_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/hsm_activity_regulon.rds"
     singularity:
@@ -532,13 +565,46 @@ rule hsm_activity_regulon_generate:
     script:
         "scripts/generate_regulon.R"
 
+# prepare PC activity regulon data
+rule prepare_pc_activity_regulon:
+    input:
+        phospho = "{dsid}_phospho.rds",
+        proteo = "{dsid}_proteo.rds",
+        meta_substrate_regulons = rules.pcmeta_substrate_regulon_generate.output.meta_protein_regulons,
+        fasta = "library.fasta"
+    output:
+        kinases = "results/{dsid}/prepare_pc_activity_regulon/kinases.txt",
+        kinases_phosphatases = "results/{dsid}/prepare_pc_activity_regulon/kinases_phosphatases.txt",
+        targets = "results/{dsid}/prepare_pc_activity_regulon/targets.txt",
+        hsm_phosphointeractions = "results/{dsid}/prepare_pc_activity_regulon/hsm_phosphointeractions.txt",
+        pc_phosphointeractions = "results/{dsid}/prepare_pc_activity_regulon/pc_phosphointeractions.txt",
+        lp_phosphointeractions = "results/{dsid}/prepare_pc_activity_regulon/lp_phosphointeractions.txt",
+        peptides = "results/{dsid}/prepare_pc_activity_regulon/peptides.txt",
+        matrix = "results/{dsid}/prepare_pc_activity_regulon/matrix.txt"
+    params:
+        minimum_targets = 5,
+        maximum_targets = 500,
+        adaptive = True,
+        fill = "rowmin",
+        hsm_threshold = 0,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 5,
+        ct_penalty = 20
+    threads: 4
+    singularity:
+        "phosphoviper.simg"
+    script:
+        "scripts/prepare_activity_regulon.R"
+
 # generate PC regulon
 rule pc_activity_regulon_mit:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        phosphointeractions = rules.prepare_activity_regulon.output.pc_phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix
+        kinases_phosphatases = rules.prepare_pc_activity_regulon.output.kinases_phosphatases,
+        phosphointeractions = rules.prepare_pc_activity_regulon.output.pc_phosphointeractions,
+        targets = rules.prepare_pc_activity_regulon.output.targets,
+        matrix = rules.prepare_pc_activity_regulon.output.matrix
     output:
         mit = "results/{dsid}/pc_activity_regulon/fwer_computed.txt"
     threads: 1
@@ -549,10 +615,10 @@ rule pc_activity_regulon_mit:
 
 rule pc_activity_regulon_bs:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        phosphointeractions = rules.prepare_activity_regulon.output.pc_phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix,
+        kinases_phosphatases = rules.prepare_pc_activity_regulon.output.kinases_phosphatases,
+        phosphointeractions = rules.prepare_pc_activity_regulon.output.pc_phosphointeractions,
+        targets = rules.prepare_pc_activity_regulon.output.targets,
+        matrix = rules.prepare_pc_activity_regulon.output.matrix,
         mit = rules.pc_activity_regulon_mit.output.mit
     output:
         iteration = temp("results/{dsid}/pc_activity_regulon/{seed}")
@@ -576,8 +642,8 @@ rule pc_activity_consolidate:
 rule pc_activity_regulon_generate:
     input:
         network = rules.pc_activity_consolidate.output.network,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        peptides = rules.prepare_activity_regulon.output.peptides
+        matrix = rules.prepare_pc_activity_regulon.output.matrix,
+        peptides = rules.prepare_pc_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/pc_activity_regulon.rds"
     singularity:
@@ -585,13 +651,46 @@ rule pc_activity_regulon_generate:
     script:
         "scripts/generate_regulon.R"
 
+# prepare DPI activity regulon data
+rule prepare_lp_activity_regulon:
+    input:
+        phospho = "{dsid}_phospho.rds",
+        proteo = "{dsid}_proteo.rds",
+        meta_substrate_regulons = rules.lpmeta_substrate_regulon_generate.output.meta_protein_regulons,
+        fasta = "library.fasta"
+    output:
+        kinases = "results/{dsid}/prepare_lp_activity_regulon/kinases.txt",
+        kinases_phosphatases = "results/{dsid}/prepare_lp_activity_regulon/kinases_phosphatases.txt",
+        targets = "results/{dsid}/prepare_lp_activity_regulon/targets.txt",
+        hsm_phosphointeractions = "results/{dsid}/prepare_lp_activity_regulon/hsm_phosphointeractions.txt",
+        pc_phosphointeractions = "results/{dsid}/prepare_lp_activity_regulon/pc_phosphointeractions.txt",
+        lp_phosphointeractions = "results/{dsid}/prepare_lp_activity_regulon/lp_phosphointeractions.txt",
+        peptides = "results/{dsid}/prepare_lp_activity_regulon/peptides.txt",
+        matrix = "results/{dsid}/prepare_lp_activity_regulon/matrix.txt"
+    params:
+        minimum_targets = 5,
+        maximum_targets = 500,
+        adaptive = True,
+        fill = "rowmin",
+        hsm_threshold = 0,
+        ct_correction = True,
+        ct_regulators_threshold = 0.05,
+        ct_shadow_threshold = 0.05,
+        ct_minimum_targets = 5,
+        ct_penalty = 20
+    threads: 4
+    singularity:
+        "phosphoviper.simg"
+    script:
+        "scripts/prepare_activity_regulon.R"
+
 # generate LP regulon
 rule lp_activity_regulon_mit:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        phosphointeractions = rules.prepare_activity_regulon.output.lp_phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix
+        kinases_phosphatases = rules.prepare_lp_activity_regulon.output.kinases_phosphatases,
+        phosphointeractions = rules.prepare_lp_activity_regulon.output.lp_phosphointeractions,
+        targets = rules.prepare_lp_activity_regulon.output.targets,
+        matrix = rules.prepare_lp_activity_regulon.output.matrix
     output:
         mit = "results/{dsid}/lp_activity_regulon/fwer_computed.txt"
     threads: 1
@@ -602,10 +701,10 @@ rule lp_activity_regulon_mit:
 
 rule lp_activity_regulon_bs:
     input:
-        kinases_phosphatases = rules.prepare_activity_regulon.output.kinases_phosphatases,
-        phosphointeractions = rules.prepare_activity_regulon.output.lp_phosphointeractions,
-        targets = rules.prepare_activity_regulon.output.targets,
-        matrix = rules.prepare_activity_regulon.output.matrix,
+        kinases_phosphatases = rules.prepare_lp_activity_regulon.output.kinases_phosphatases,
+        phosphointeractions = rules.prepare_lp_activity_regulon.output.lp_phosphointeractions,
+        targets = rules.prepare_lp_activity_regulon.output.targets,
+        matrix = rules.prepare_lp_activity_regulon.output.matrix,
         mit = rules.lp_activity_regulon_mit.output.mit
     output:
         iteration = temp("results/{dsid}/lp_activity_regulon/{seed}")
@@ -629,8 +728,8 @@ rule lp_activity_consolidate:
 rule lp_activity_regulon_generate:
     input:
         network = rules.lp_activity_consolidate.output.network,
-        matrix = rules.prepare_activity_regulon.output.matrix,
-        peptides = rules.prepare_activity_regulon.output.peptides
+        matrix = rules.prepare_lp_activity_regulon.output.matrix,
+        peptides = rules.prepare_lp_activity_regulon.output.peptides
     output:
         regulon = "results/{dsid}/lp_activity_regulon.rds"
     singularity:
@@ -670,8 +769,8 @@ rule meta_activity_regulon_generate:
 # generate DPI-meta activity regulons
 rule dpimeta_activity_regulon_generate:
     input:
-        ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        ref = rules.ddpimeta_substrate_regulon_generate.input.ref,
+        substrate_regulons = rules.ddpimeta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/dpi_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
@@ -699,8 +798,8 @@ rule dpimeta_activity_regulon_generate:
 # generate HSM-meta activity regulons
 rule hsmmeta_activity_regulon_generate:
     input:
-        ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        ref = rules.hsmmeta_substrate_regulon_generate.input.ref,
+        substrate_regulons = rules.hsmmeta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/hsm_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
@@ -728,8 +827,8 @@ rule hsmmeta_activity_regulon_generate:
 # generate PC-meta activity regulons
 rule pcmeta_activity_regulon_generate:
     input:
-        ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        ref = rules.pcmeta_substrate_regulon_generate.input.ref,
+        substrate_regulons = rules.pcmeta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/pc_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
@@ -757,8 +856,8 @@ rule pcmeta_activity_regulon_generate:
 # generate LP-meta activity regulons
 rule lpmeta_activity_regulon_generate:
     input:
-        ref = rules.meta_substrate_regulon_generate.input.ref,
-        substrate_regulons = rules.meta_substrate_regulon_generate.output.meta_protein_regulons,
+        ref = rules.lpmeta_substrate_regulon_generate.input.ref,
+        substrate_regulons = rules.lpmeta_substrate_regulon_generate.output.meta_protein_regulons,
         regulons = expand("results/{dsid}/lp_activity_regulon.rds", dsid=dsids),
         fasta = "library.fasta"
     output:
