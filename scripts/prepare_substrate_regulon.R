@@ -1,5 +1,5 @@
-library(phosphoviper)
-library(phosphoviper.db)
+library(vespa)
+library(vespa.db)
 
 # import preprocessed data
 phospho<-readRDS(snakemake@input[["phospho"]])

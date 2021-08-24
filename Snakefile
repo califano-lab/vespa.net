@@ -1,4 +1,4 @@
-# phosphoviper.net version 1.0.2
+# vespa.net version 1.0.2
 
 # number of ARACNe bootstrap iterations
 seed = list(range(1,201))
@@ -33,7 +33,7 @@ rule prepare_substrate_regulon:
         hsm_threshold = 0,
         restrict_peptides = False
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/prepare_substrate_regulon.R"
 
@@ -86,7 +86,7 @@ rule ddpi_substrate_regulon_generate:
     output:
         regulon = "results/{dsid}/ddpi_substrate_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -141,7 +141,7 @@ rule hsm_substrate_regulon_generate:
     output:
         regulon = "results/{dsid}/hsm_substrate_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -196,7 +196,7 @@ rule pc_substrate_regulon_generate:
     output:
         regulon = "results/{dsid}/pc_substrate_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -251,7 +251,7 @@ rule lp_substrate_regulon_generate:
     output:
         regulon = "results/{dsid}/lp_substrate_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -279,7 +279,7 @@ rule meta_substrate_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -307,7 +307,7 @@ rule ddpimeta_substrate_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -335,7 +335,7 @@ rule hsmmeta_substrate_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -363,7 +363,7 @@ rule pcmeta_substrate_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -391,7 +391,7 @@ rule lpmeta_substrate_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -424,7 +424,7 @@ rule prepare_dpi_activity_regulon:
         ct_penalty = 20
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/prepare_activity_regulon.R"
 
@@ -475,7 +475,7 @@ rule dpi_activity_regulon_generate:
     output:
         regulon = "results/{dsid}/dpi_activity_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -508,7 +508,7 @@ rule prepare_hsm_activity_regulon:
         ct_penalty = 20
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/prepare_activity_regulon.R"
 
@@ -561,7 +561,7 @@ rule hsm_activity_regulon_generate:
     output:
         regulon = "results/{dsid}/hsm_activity_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -594,7 +594,7 @@ rule prepare_pc_activity_regulon:
         ct_penalty = 20
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/prepare_activity_regulon.R"
 
@@ -647,7 +647,7 @@ rule pc_activity_regulon_generate:
     output:
         regulon = "results/{dsid}/pc_activity_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -680,7 +680,7 @@ rule prepare_lp_activity_regulon:
         ct_penalty = 20
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/prepare_activity_regulon.R"
 
@@ -733,7 +733,7 @@ rule lp_activity_regulon_generate:
     output:
         regulon = "results/{dsid}/lp_activity_regulon.rds"
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_regulon.R"
 
@@ -762,7 +762,7 @@ rule meta_activity_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -791,7 +791,7 @@ rule dpimeta_activity_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -820,7 +820,7 @@ rule hsmmeta_activity_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -849,7 +849,7 @@ rule pcmeta_activity_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"
 
@@ -878,6 +878,6 @@ rule lpmeta_activity_regulon_generate:
         transform = "zscore"
     threads: 4
     singularity:
-        "phosphoviper.simg"
+        "vespa.simg"
     script:
         "scripts/generate_meta_regulon.R"

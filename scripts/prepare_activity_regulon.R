@@ -1,6 +1,6 @@
 library(viper)
-library(phosphoviper)
-library(phosphoviper.db)
+library(vespa)
+library(vespa.db)
 library(stringr)
 
 if (snakemake@params[["fill"]] == "NA") {
@@ -19,7 +19,7 @@ meta_substrate_regulons<-readRDS(snakemake@input[["meta_substrate_regulons"]])
 print(meta_substrate_regulons)
 
 # run VIPER
-vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(meta_substrate_regulons, rownames(qmx), snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
+vmx<-viper(qmx, vespa::pruneRegulon(vespa::subsetRegulon(meta_substrate_regulons, rownames(qmx), snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
 # convert to phosphoVIPER list
 if (str_detect(rownames(vmx)[1],":")) {

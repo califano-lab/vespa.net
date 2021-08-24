@@ -1,5 +1,5 @@
 library(viper)
-library(phosphoviper)
+library(vespa)
 library(stringr)
 
 rn_mx<-function(qmx) {
@@ -31,7 +31,7 @@ qmx<-export2mx(refmx, fillvalues = fillvalues)
 # compute substrate-level VIPER matrix
 if (length(snakemake@input[["substrate_regulons"]]) == 1) {
 	substrate_regulons<-readRDS(snakemake@input[["substrate_regulons"]])
-	vmx<-viper(qmx, phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(substrate_regulons, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
+	vmx<-viper(qmx, vespa::pruneRegulon(vespa::subsetRegulon(substrate_regulons, rownames(qmx), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]]), minsize=snakemake@params[["minimum_targets"]], pleiotropy = snakemake@params[["ct_correction"]], pleiotropyArgs = list(regulators = snakemake@params[["ct_regulators_threshold"]], shadow = snakemake@params[["ct_shadow_threshold"]], targets = snakemake@params[["ct_minimum_targets"]], penalty = snakemake@params[["ct_penalty"]], method = "adaptive"), cores=snakemake@threads)
 
 	if (str_detect(rownames(vmx)[1],":")) {
 		vmxa<-export2mx(vmx2pv(vmx, fasta=NULL), fillvalues = fillvalues)
@@ -64,12 +64,12 @@ single_regulons<-snakemake@input[["regulons"]]
 
 if(length(single_regulons)>1) {
 	# tune all regulons
-	combined_regulons<-sapply(single_regulons, function(X){phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])})
+	combined_regulons<-sapply(single_regulons, function(X){vespa::pruneRegulon(vespa::subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])})
 
 	# combine and optimize regulons
 	meta_redundantsite_regulons<-optimizeRegulon(vmxa_sig, combined_regulons)
 } else {
-	meta_redundantsite_regulons<-phosphoviper::pruneRegulon(phosphoviper::subsetRegulon(readRDS(single_regulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])
+	meta_redundantsite_regulons<-vespa::pruneRegulon(vespa::subsetRegulon(readRDS(single_regulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])
 }
 
 # generate non-redundant, non-correlated site-level regulons
