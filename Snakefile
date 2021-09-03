@@ -9,7 +9,7 @@ dsids, = glob_wildcards("{dsid}_phospho.rds")
 rule all:
     input:
         "results/ddpimeta_substrate_site_regulon.rds", "results/ddpimeta_substrate_protein_regulon.rds",
-        "results/dpimeta_substrate_site_regulon.rds", "results/ddimeta_substrate_protein_regulon.rds",
+        "results/dpimeta_substrate_site_regulon.rds", "results/dpimeta_substrate_protein_regulon.rds",
         "results/nodpimeta_substrate_site_regulon.rds", "results/nodpimeta_substrate_protein_regulon.rds",
         "results/hsmmeta_substrate_site_regulon.rds", "results/hsmmeta_substrate_protein_regulon.rds",
         "results/lpmeta_substrate_site_regulon.rds", "results/lpmeta_substrate_protein_regulon.rds"
