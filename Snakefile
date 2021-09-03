@@ -363,7 +363,7 @@ rule ddpimeta_substrate_regulon_generate:
         "scripts/generate_meta_regulon.R"
 
 # generate DPI-meta substrate regulons
-rule ddpimeta_substrate_regulon_generate:
+rule dpimeta_substrate_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = [],
@@ -391,7 +391,7 @@ rule ddpimeta_substrate_regulon_generate:
         "scripts/generate_meta_regulon.R"
 
 # generate noDPI-meta substrate regulons
-rule ddpimeta_substrate_regulon_generate:
+rule nodpimeta_substrate_regulon_generate:
     input:
         ref = rules.meta_substrate_regulon_generate.input.ref,
         substrate_regulons = [],
