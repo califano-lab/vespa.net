@@ -59,24 +59,34 @@ if ("control" %in% colnames(refmx)) {
 	vmxa_sig<-vmxa
 }
 
-# import single regulons
-single_regulons<-snakemake@input[["regulons"]]
+# import single siteregulons
+single_siteregulons<-snakemake@input[["siteregulons"]]
 
-if(length(single_regulons)>1) {
+if(length(single_siteregulons)>1) {
 	# tune all regulons
-	combined_regulons<-sapply(single_regulons, function(X){vespa::pruneRegulon(vespa::subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])})
+	combined_siteregulons<-sapply(single_siteregulons, function(X){vespa::pruneRegulon(vespa::subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])})
 
 	# combine and optimize regulons
-	meta_redundantsite_regulons<-optimizeRegulon(vmxa_sig, combined_regulons)
+	meta_redundantsite_regulons<-optimizeRegulon(vmxa_sig, combined_siteregulons)
 } else {
-	meta_redundantsite_regulons<-vespa::pruneRegulon(vespa::subsetRegulon(readRDS(single_regulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])
+	meta_redundantsite_regulons<-vespa::pruneRegulon(vespa::subsetRegulon(readRDS(single_siteregulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])
 }
 
 # generate non-redundant, non-correlated site-level regulons
 meta_site_regulons<-orthogonalRegulon(vmxa_sig, meta_redundantsite_regulons, cutoff=snakemake@params[["orthogonal_cutoff"]])
 
-# generate protein-level regulons
-meta_protein_regulons<-optimizeRegulon(vmxa_sig, regulator2protein(meta_redundantsite_regulons))
+# import single proteinregulons
+single_proteinregulons<-snakemake@input[["proteinregulons"]]
+
+if(length(single_proteinregulons)>1) {
+	# tune all regulons
+	combined_proteinregulons<-sapply(single_proteinregulons, function(X){vespa::pruneRegulon(vespa::subsetRegulon(readRDS(X), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])})
+
+	# combine and optimize regulons
+	meta_protein_regulons<-optimizeRegulon(vmxa_sig, combined_proteinregulons)
+} else {
+	meta_protein_regulons<-vespa::pruneRegulon(vespa::subsetRegulon(readRDS(single_proteinregulons), rownames(vmxa), min_size=snakemake@params[["minimum_targets"]]), snakemake@params[["maximum_targets"]], adaptive=snakemake@params[["adaptive"]])
+}
 
 # save meta regulons
 saveRDS(meta_redundantsite_regulons, snakemake@output[["meta_redundantsite_regulons"]])
