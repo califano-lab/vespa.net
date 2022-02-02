@@ -1,7 +1,7 @@
 # vespa.net version 1.0.2
 
 # number of ARACNe bootstrap iterations
-seed = list(range(1,3))
+seed = list(range(1,201))
 
 # obtain dataset ids from phospho data
 dsids, = glob_wildcards("{dsid}_phospho.rds")
@@ -738,7 +738,7 @@ rule prepare_lp_activity_regulon:
         maximum_targets = 500,
         adaptive = True,
         fill = "rowmin",
-        lp_threshold = 0,
+        hsm_threshold = 0,
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
@@ -1018,7 +1018,7 @@ rule prepare_pc_activity_regulon:
         maximum_targets = 500,
         adaptive = True,
         fill = "rowmin",
-        pc_threshold = 0,
+        hsm_threshold = 0,
         ct_correction = True,
         ct_regulators_threshold = 0.05,
         ct_shadow_threshold = 0.05,
