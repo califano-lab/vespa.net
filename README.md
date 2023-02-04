@@ -14,8 +14,8 @@ git clone git@github.com:califano-lab/vespa.net.git
 If you are using [Singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html) on a HPC environment, build Singularity images for ARACNe and VESPA first:
 
 ```
-singularity build aracne.simg docker://docker.pkg.github.com/califano-lab/aracne/aracne:latest
-singularity build vespa.simg docker://docker.pkg.github.com/califano-lab/vespa/vespa:latest
+singularity build aracne.simg docker://ghcr.io/califano-lab/vespa.aracne:latest
+singularity build vespa.simg docker://ghcr.io/califano-lab/vespa:latest
 ```
 
 ## 2. Using vespa.net
