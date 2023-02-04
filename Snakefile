@@ -917,7 +917,8 @@ rule lp_activity_proteinregulon_patch:
     container:
         "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
-        "vespa.simg"    script:
+        "vespa.simg"
+    script:
         "scripts/patch_regulon.R"
 
 rule lp_activity_siteregulon_consolidate:
@@ -958,7 +959,8 @@ rule lp_activity_siteregulon_generate:
     container:
         "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
-        "vespa.simg"    script:
+        "vespa.simg"
+    script:
         "scripts/generate_regulon.R"
 
 rule lp_activity_proteinregulon_generate:
