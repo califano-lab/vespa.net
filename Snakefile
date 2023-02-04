@@ -31,6 +31,8 @@ rule prepare_substrate_regulon:
     params:
         hsm_threshold = 0,
         restrict_peptides = False
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -46,6 +48,8 @@ rule stdpi_substrate_regulon_mit:
     output:
         mit = "results/{dsid}/stdpi_substrate_regulon/fwer_computed.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -61,6 +65,8 @@ rule stdpi_substrate_regulon_bs:
     output:
         iteration = temp("results/{dsid}/stdpi_substrate_regulon/{seed}/{seed}")
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -75,6 +81,8 @@ rule stdpi_substrate_proteinregulon_patch:
         sitenetwork = "results/{dsid}/stdpi_substrate_siteregulon/bootstrapNetwork_{seed}.txt",
         proteinnetwork = "results/{dsid}/stdpi_substrate_proteinregulon/bootstrapNetwork_{seed}.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -86,6 +94,8 @@ rule stdpi_substrate_siteregulon_consolidate:
     output:
         network = "results/{dsid}/stdpi_substrate_siteregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -97,6 +107,8 @@ rule stdpi_substrate_proteinregulon_consolidate:
     output:
         network = "results/{dsid}/stdpi_substrate_proteinregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -111,6 +123,8 @@ rule stdpi_substrate_siteregulon_generate:
         regulon = "results/{dsid}/stdpi_substrate_siteregulon.rds"
     params:
         proteinlevel = False
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -125,6 +139,8 @@ rule stdpi_substrate_proteinregulon_generate:
         regulon = "results/{dsid}/stdpi_substrate_proteinregulon.rds"
     params:
         proteinlevel = True
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -153,6 +169,8 @@ rule stdpimeta_substrate_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -169,6 +187,8 @@ rule hsm_substrate_regulon_mit:
     output:
         mit = "results/{dsid}/hsm_substrate_regulon/fwer_computed.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -185,6 +205,8 @@ rule hsm_substrate_regulon_bs:
     output:
         iteration = temp("results/{dsid}/hsm_substrate_regulon/{seed}/{seed}")
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -199,6 +221,8 @@ rule hsm_substrate_proteinregulon_patch:
         sitenetwork = "results/{dsid}/hsm_substrate_siteregulon/bootstrapNetwork_{seed}.txt",
         proteinnetwork = "results/{dsid}/hsm_substrate_proteinregulon/bootstrapNetwork_{seed}.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -210,8 +234,11 @@ rule hsm_substrate_siteregulon_consolidate:
     output:
         network = "results/{dsid}/hsm_substrate_siteregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
+
     shell:
         "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -o $(dirname {output}) -c -j {threads} && tar czvf $(dirname {output})/bootstrapNetwork.tgz $(dirname {output})/bootstrapNetwork_*.txt && rm $(dirname {output})/bootstrapNetwork_*.txt"
 
@@ -221,6 +248,8 @@ rule hsm_substrate_proteinregulon_consolidate:
     output:
         network = "results/{dsid}/hsm_substrate_proteinregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -235,6 +264,8 @@ rule hsm_substrate_siteregulon_generate:
         regulon = "results/{dsid}/hsm_substrate_siteregulon.rds"
     params:
         proteinlevel = False
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -249,6 +280,8 @@ rule hsm_substrate_proteinregulon_generate:
         regulon = "results/{dsid}/hsm_substrate_proteinregulon.rds"
     params:
         proteinlevel = True
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -277,6 +310,8 @@ rule hsmmeta_substrate_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -293,8 +328,11 @@ rule lp_substrate_regulon_mit:
     output:
         mit = "results/{dsid}/lp_substrate_regulon/fwer_computed.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
+
     shell:
         "java -Xmx14G -jar /aracne/dist/aracne.jar -ct 0 -e {input.matrix} -r {input.kinases_phosphatases} -a {input.kinases} -i {input.phosphointeractions} -tg {input.targets} -o $(dirname {output}) -s 1 -t -j {threads} && touch {output}"
 
@@ -309,6 +347,8 @@ rule lp_substrate_regulon_bs:
     output:
         iteration = temp("results/{dsid}/lp_substrate_regulon/{seed}/{seed}")
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -323,6 +363,8 @@ rule lp_substrate_proteinregulon_patch:
         sitenetwork = "results/{dsid}/lp_substrate_siteregulon/bootstrapNetwork_{seed}.txt",
         proteinnetwork = "results/{dsid}/lp_substrate_proteinregulon/bootstrapNetwork_{seed}.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -334,6 +376,8 @@ rule lp_substrate_siteregulon_consolidate:
     output:
         network = "results/{dsid}/lp_substrate_siteregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -345,6 +389,8 @@ rule lp_substrate_proteinregulon_consolidate:
     output:
         network = "results/{dsid}/lp_substrate_proteinregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -359,6 +405,8 @@ rule lp_substrate_siteregulon_generate:
         regulon = "results/{dsid}/lp_substrate_siteregulon.rds"
     params:
         proteinlevel = False
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -373,6 +421,8 @@ rule lp_substrate_proteinregulon_generate:
         regulon = "results/{dsid}/lp_substrate_proteinregulon.rds"
     params:
         proteinlevel = True
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -401,6 +451,8 @@ rule lpmeta_substrate_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -430,6 +482,8 @@ rule meta_substrate_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -463,6 +517,8 @@ rule prepare_dpi_activity_regulon:
         ct_minimum_targets = 5,
         ct_penalty = 20
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -477,6 +533,8 @@ rule dpi_activity_regulon_mit:
     output:
         mit = "results/{dsid}/dpi_activity_regulon/fwer_computed.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -492,6 +550,8 @@ rule dpi_activity_regulon_bs:
     output:
         iteration = temp("results/{dsid}/dpi_activity_regulon/{seed}/{seed}")
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -506,6 +566,8 @@ rule dpi_activity_proteinregulon_patch:
         sitenetwork = "results/{dsid}/dpi_activity_siteregulon/bootstrapNetwork_{seed}.txt",
         proteinnetwork = "results/{dsid}/dpi_activity_proteinregulon/bootstrapNetwork_{seed}.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -517,6 +579,8 @@ rule dpi_activity_siteregulon_consolidate:
     output:
         network = "results/{dsid}/dpi_activity_siteregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -528,6 +592,8 @@ rule dpi_activity_proteinregulon_consolidate:
     output:
         network = "results/{dsid}/dpi_activity_proteinregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -542,6 +608,8 @@ rule dpi_activity_siteregulon_generate:
         regulon = "results/{dsid}/dpi_activity_siteregulon.rds"
     params:
         proteinlevel = False
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -556,6 +624,8 @@ rule dpi_activity_proteinregulon_generate:
         regulon = "results/{dsid}/dpi_activity_proteinregulon.rds"
     params:
         proteinlevel = True
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -585,6 +655,8 @@ rule dpimeta_activity_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -618,6 +690,8 @@ rule prepare_hsm_activity_regulon:
         ct_minimum_targets = 5,
         ct_penalty = 20
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -633,6 +707,8 @@ rule hsm_activity_regulon_mit:
     output:
         mit = "results/{dsid}/hsm_activity_regulon/fwer_computed.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -648,6 +724,8 @@ rule hsm_activity_regulon_bs:
     output:
         iteration = temp("results/{dsid}/hsm_activity_regulon/{seed}/{seed}")
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -662,6 +740,8 @@ rule hsm_activity_proteinregulon_patch:
         sitenetwork = "results/{dsid}/hsm_activity_siteregulon/bootstrapNetwork_{seed}.txt",
         proteinnetwork = "results/{dsid}/hsm_activity_proteinregulon/bootstrapNetwork_{seed}.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -673,6 +753,8 @@ rule hsm_activity_siteregulon_consolidate:
     output:
         network = "results/{dsid}/hsm_activity_siteregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -684,6 +766,8 @@ rule hsm_activity_proteinregulon_consolidate:
     output:
         network = "results/{dsid}/hsm_activity_proteinregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -698,6 +782,8 @@ rule hsm_activity_siteregulon_generate:
         regulon = "results/{dsid}/hsm_activity_siteregulon.rds"
     params:
         proteinlevel = False
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -712,6 +798,8 @@ rule hsm_activity_proteinregulon_generate:
         regulon = "results/{dsid}/hsm_activity_proteinregulon.rds"
     params:
         proteinlevel = True
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -741,6 +829,8 @@ rule hsmmeta_activity_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -774,6 +864,8 @@ rule prepare_lp_activity_regulon:
         ct_minimum_targets = 5,
         ct_penalty = 20
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -789,6 +881,8 @@ rule lp_activity_regulon_mit:
     output:
         mit = "results/{dsid}/lp_activity_regulon/fwer_computed.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -804,6 +898,8 @@ rule lp_activity_regulon_bs:
     output:
         iteration = temp("results/{dsid}/lp_activity_regulon/{seed}/{seed}")
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -818,9 +914,10 @@ rule lp_activity_proteinregulon_patch:
         sitenetwork = "results/{dsid}/lp_activity_siteregulon/bootstrapNetwork_{seed}.txt",
         proteinnetwork = "results/{dsid}/lp_activity_proteinregulon/bootstrapNetwork_{seed}.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
-        "vespa.simg"
-    script:
+        "vespa.simg"    script:
         "scripts/patch_regulon.R"
 
 rule lp_activity_siteregulon_consolidate:
@@ -829,6 +926,8 @@ rule lp_activity_siteregulon_consolidate:
     output:
         network = "results/{dsid}/lp_activity_siteregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -840,6 +939,8 @@ rule lp_activity_proteinregulon_consolidate:
     output:
         network = "results/{dsid}/lp_activity_proteinregulon/network.txt"
     threads: 1
+    container:
+        "docker://ghcr.io/califano-lab/vespa.aracne:latest"
     singularity:
         "aracne.simg"
     shell:
@@ -854,9 +955,10 @@ rule lp_activity_siteregulon_generate:
         regulon = "results/{dsid}/lp_activity_siteregulon.rds"
     params:
         proteinlevel = False
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
-        "vespa.simg"
-    script:
+        "vespa.simg"    script:
         "scripts/generate_regulon.R"
 
 rule lp_activity_proteinregulon_generate:
@@ -868,6 +970,8 @@ rule lp_activity_proteinregulon_generate:
         regulon = "results/{dsid}/lp_activity_proteinregulon.rds"
     params:
         proteinlevel = True
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -897,6 +1001,8 @@ rule lpmeta_activity_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
@@ -927,6 +1033,8 @@ rule meta_activity_regulon_generate:
         orthogonal_cutoff = 0.5,
         transform = "zscore"
     threads: 4
+    container:
+        "docker://ghcr.io/califano-lab/vespa:latest"
     singularity:
         "vespa.simg"
     script:
