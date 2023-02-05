@@ -16,7 +16,7 @@
         "resources" : "\"rusage[mem=65536,scratch=8192]\"",
     },
 
-    "ddpi_substrate_regulon_mit" :
+    "stdpi_substrate_regulon_mit" :
     {
         "nCPUs"     : "1",
         "memory"    : 32768,
