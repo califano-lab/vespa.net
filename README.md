@@ -1,7 +1,7 @@
 # vespa.net - Signaling reconstruction module for the VESPA R-package
 
 ## 1. Installation
-This module requires the [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflow manager and Docker to be installed and ready to use. It has only been tested on a CentOS 7 cluster, but it might work on other systems too.
+This module requires the [Snakemake](https://snakemake.readthedocs.io/en/stable/) workflow manager and either Singularity (Linux) or local versions of the [``vespa``](https://github.com/califano-lab/vespa) R-package and [``vespa.aracne``](https://github.com/califano-lab/vespa.aracne) (Linux/macOS/WSL) to be installed. It has only been tested on a CentOS 7 cluster, but it might work on other systems too.
 
 ### Download repository
 Clone the repository to your working directory.
@@ -11,11 +11,15 @@ git clone git@github.com:califano-lab/vespa.net.git
 ```
 
 ### Singularity
-If you are using [Singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html) on a HPC environment, build Singularity images for ARACNe and VESPA first:
+If you are using [Singularity](https://docs.sylabs.io/guides/3.5/user-guide/introduction.html) on a HPC environment, Singularity images for vespa and vespa.aracne will be downloaded and generated automatically.
+
+### Local installation
+Please install the [``vespa``](https://github.com/califano-lab/vespa) R-package and [``vespa.aracne``](https://github.com/califano-lab/vespa.aracne) separately. Make sure that the ``vespa.aracne`` JAR file is exported to the Java classpath:
 
 ```
-singularity build aracne.simg docker://ghcr.io/califano-lab/vespa.aracne:latest
-singularity build vespa.simg docker://ghcr.io/califano-lab/vespa:latest
+export CLASSPATH=$CLASSPATH:REPLACE_WITH_PATH_TO_CODE/vespa.aracne/dist/aracne.jar
+java aracne.Aracne # this should display the help text of vespa.aracne if everything works.
+
 ```
 
 ## 2. Using vespa.net
@@ -30,7 +34,7 @@ Place the FASTA library (without decoys) used for the MS analysis in file ``libr
 
 ## 3. Run analysis
 
-Submit the Snakemake job. On a local computer, this could for example be:
+Submit the Snakemake job. On a local computer with local installation, this could for example be:
 
 ```
 snakemake --snakefile Snakefile -j 64 --restart-times 2
