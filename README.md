@@ -18,8 +18,8 @@ Please install the [``vespa``](https://github.com/califano-lab/vespa) R-package 
 
 ```
 export CLASSPATH=$CLASSPATH:REPLACE_WITH_PATH_TO_CODE/vespa.aracne/dist/aracne.jar
-java aracne.Aracne # this should display the help text of vespa.aracne if everything works.
 
+java aracne.Aracne # this should display the help text of vespa.aracne if everything works.
 ```
 
 ## 2. Using vespa.net
